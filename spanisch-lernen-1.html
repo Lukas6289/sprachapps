@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Spanisch Fiesta – Vokabeltrainer</title>
+<style>
+:root{
+  --bg:#CEDDDB;
+  --card:#F7FBFA;
+  --ink:#16283A;
+  --ink-soft:#4E6779;
+  --lapis:#2B5FC7;
+  --lapis-deep:#1E4494;
+  --turq:#12968E;
+  --turq-soft:#D6EEEB;
+  --saffron:#F2A81D;
+  --pome:#C33C54;
+  --ok:#1F9D55;
+  --ok-soft:#DFF2E6;
+  --bad:#C0392B;
+  --bad-soft:#FBE7E4;
+  --warn-soft:#FCF2DB;
+  --radius:20px;
+  --shadow:0 4px 14px rgba(22,40,58,.14);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:ui-rounded,"SF Pro Rounded","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+  min-height:100vh;
+}
+/* ---------- Kopfzeile mit Kachelmuster ---------- */
+header{
+  background:var(--lapis);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%233F74D6' stroke-width='2'%3E%3Cpath d='M28 4 L34 22 L52 28 L34 34 L28 52 L22 34 L4 28 L22 22 Z'/%3E%3C/g%3E%3C/svg%3E");
+  color:#fff;
+  padding:14px 16px 12px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(30,68,148,.35);
+}
+.head-row{display:flex;align-items:center;gap:10px;max-width:980px;margin:0 auto}
+.head-row h1{font-size:1.15rem;margin:0;flex:1;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{
+  background:rgba(255,255,255,.16);
+  border:1.5px solid rgba(255,255,255,.35);
+  border-radius:999px;padding:6px 12px;font-weight:700;font-size:.95rem;
+  display:flex;align-items:center;gap:5px;white-space:nowrap;
+}
+.pill.streak{background:rgba(242,168,29,.25);border-color:var(--saffron)}
+#btn-home{background:rgba(255,255,255,.16);border:1.5px solid rgba(255,255,255,.35);color:#fff;border-radius:14px;font-size:1.3rem;padding:6px 12px;cursor:pointer;line-height:1}
+.xpbar{max-width:980px;margin:10px auto 0;background:rgba(255,255,255,.22);border-radius:99px;height:10px;overflow:hidden}
+.xpbar>div{height:100%;background:var(--saffron);border-radius:99px;transition:width .5s ease}
+.xp-label{max-width:980px;margin:4px auto 0;font-size:.75rem;opacity:.9;display:flex;justify-content:space-between}
+
+/* ---------- Grundlayout ---------- */
+main{max-width:980px;margin:0 auto;padding:18px 14px 90px}
+.screen{animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+h2{font-size:1.5rem;margin:.3em 0 .5em}
+h3{font-size:1.15rem;margin:.4em 0}
+.muted{color:var(--ink-soft)}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:14px}
+
+/* ---------- Buttons ---------- */
+button{font-family:inherit}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;min-height:60px;padding:14px 18px;margin:8px 0;
+  border:none;border-radius:18px;cursor:pointer;
+  font-size:1.15rem;font-weight:800;color:#fff;background:var(--lapis);
+  box-shadow:0 4px 0 var(--lapis-deep);
+  transition:transform .08s ease;
+}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--lapis-deep)}
+.btn.turq{background:var(--turq);box-shadow:0 4px 0 #0D7B74}
+.btn.turq:active{box-shadow:0 1px 0 #0D7B74}
+.btn.saffron{background:var(--saffron);box-shadow:0 4px 0 #C4830C;color:#4A3403}
+.btn.saffron:active{box-shadow:0 1px 0 #C4830C}
+.btn.pome{background:var(--pome);box-shadow:0 4px 0 #93293E}
+.btn.pome:active{box-shadow:0 1px 0 #93293E}
+.btn.ghost{background:#fff;color:var(--lapis);border:2px solid var(--lapis);box-shadow:none;font-weight:700}
+.btn.small{min-height:48px;font-size:1rem;width:auto;padding:10px 18px;display:inline-flex}
+.btn:disabled{opacity:.45;cursor:default}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+.btn-row .btn{flex:1;min-width:140px}
+.big-emoji{font-size:1.5rem}
+
+/* ---------- Startmenü ---------- */
+.menu-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:640px){.menu-grid{grid-template-columns:1fr 1fr}}
+.menu-tile{
+  background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:20px;cursor:pointer;border:none;text-align:left;
+  display:flex;gap:14px;align-items:center;min-height:96px;
+  transition:transform .1s ease;
+}
+.menu-tile:active{transform:scale(.97)}
+.menu-tile .icon{
+  font-size:2rem;width:64px;height:64px;flex:none;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:18px;background:var(--turq-soft);
+}
+.menu-tile b{font-size:1.15rem;display:block}
+.menu-tile small{color:var(--ink-soft);font-size:.9rem}
+
+/* ---------- Kategorien ---------- */
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(min-width:700px){.cat-grid{grid-template-columns:1fr 1fr 1fr}}
+.cat-tile{
+  background:var(--card);border:none;border-radius:16px;box-shadow:var(--shadow);
+  padding:14px;text-align:left;cursor:pointer;min-height:92px;
+}
+.cat-tile:active{transform:scale(.97)}
+.cat-tile .em{font-size:1.5rem}
+.cat-tile b{display:block;margin:4px 0 6px;font-size:1rem}
+.mini-bar{background:#C0D3D1;height:8px;border-radius:99px;overflow:hidden}
+.mini-bar>div{height:100%;background:var(--turq);border-radius:99px}
+.cat-tile small{color:var(--ink-soft);font-size:.75rem}
+
+/* ---------- Lernkarten ---------- */
+.flash-wrap{perspective:1200px;margin:14px 0}
+.flash{
+  position:relative;width:100%;min-height:230px;cursor:pointer;
+  transform-style:preserve-3d;transition:transform .5s;
+}
+.flash.flipped{transform:rotateY(180deg)}
+.flash .face{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  background:var(--card);border-radius:24px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;text-align:center;
+}
+.flash .face.back{transform:rotateY(180deg);background:var(--turq-soft)}
+.flash .word{font-size:2.2rem;font-weight:900;letter-spacing:.5px}
+.flash .tag{font-size:.8rem;font-weight:700;color:var(--turq);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.flash .hint{color:var(--ink-soft);font-size:.85rem;margin-top:14px}
+.counter{color:var(--ink-soft);font-weight:700;text-align:center;margin:6px 0}
+
+/* ---------- Test ---------- */
+.quiz-word{font-size:2rem;font-weight:900;text-align:center;margin:10px 0 4px}
+.quiz-cat{text-align:center;color:var(--turq);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:1px}
+input[type=text]{
+  width:100%;min-height:60px;font-size:1.4rem;text-align:center;
+  border:2.5px solid #B7CCCA;border-radius:16px;padding:10px 14px;
+  font-family:inherit;background:#fff;color:var(--ink);
+}
+input[type=text]:focus{outline:none;border-color:var(--lapis)}
+.feedback{border-radius:16px;padding:14px;margin:12px 0;font-weight:700;text-align:center;font-size:1.1rem}
+.feedback.ok{background:var(--ok-soft);color:var(--ok)}
+.feedback.bad{background:var(--bad-soft);color:var(--bad)}
+.feedback.warn{background:var(--warn-soft);color:#8A6207}
+.compare{display:flex;gap:10px;margin:10px 0}
+.compare>div{flex:1;background:#fff;border-radius:14px;padding:10px;text-align:center;border:2px solid #DCE8E7}
+.compare b{font-size:1.3rem;display:block}
+.compare small{color:var(--ink-soft)}
+.progress-dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+.dot{width:12px;height:12px;border-radius:50%;background:#AFC5C3}
+.dot.ok{background:var(--ok)}.dot.bad{background:var(--pome)}.dot.now{background:var(--saffron)}
+
+/* ---------- Spiele ---------- */
+.memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mem-card{
+  min-height:76px;border:none;border-radius:14px;cursor:pointer;
+  font-weight:800;font-size:.95rem;padding:6px;
+  background:var(--lapis);color:var(--lapis);box-shadow:0 3px 0 var(--lapis-deep);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M14 2 L17 11 L26 14 L17 17 L14 26 L11 17 L2 14 L11 11 Z' fill='%233F74D6'/%3E%3C/svg%3E");
+}
+.mem-card.open{background:var(--card);background-image:none;color:var(--ink);box-shadow:var(--shadow)}
+.mem-card.done{background:var(--ok-soft);background-image:none;color:var(--ok);box-shadow:none}
+.choice-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:560px){.choice-grid{grid-template-columns:1fr 1fr}}
+.choice{
+  min-height:64px;border:none;border-radius:16px;background:var(--card);
+  box-shadow:var(--shadow);font-size:1.2rem;font-weight:800;cursor:pointer;color:var(--ink);
+}
+.choice.ok{background:var(--ok-soft);color:var(--ok)}
+.choice.bad{background:var(--bad-soft);color:var(--bad)}
+.timer-bar{background:#C0D3D1;height:14px;border-radius:99px;overflow:hidden;margin:10px 0}
+.timer-bar>div{height:100%;background:var(--pome);border-radius:99px;transition:width 1s linear}
+.letters,.answer-slots{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
+.letter{
+  min-width:52px;min-height:56px;font-size:1.4rem;font-weight:900;
+  border:none;border-radius:12px;background:var(--card);box-shadow:var(--shadow);
+  cursor:pointer;color:var(--ink);
+}
+.letter.used{opacity:.25;pointer-events:none}
+.slot{
+  min-width:44px;min-height:52px;border-radius:10px;background:var(--turq-soft);
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;
+  border:2px dashed #8FC5C0;
+}
+.slot.filled{border-style:solid;background:#fff}
+
+/* ---------- Fortschritt & Abzeichen ---------- */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:14px;text-align:center}
+.stat b{font-size:1.7rem;display:block}
+.stat small{color:var(--ink-soft)}
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.badge{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:12px 6px;text-align:center}
+.badge .em{font-size:1.9rem}
+.badge small{display:block;font-size:.72rem;font-weight:700;margin-top:4px}
+.badge.locked{opacity:.35;filter:grayscale(1)}
+.cat-progress{margin:8px 0}
+.cat-progress .row{display:flex;justify-content:space-between;font-size:.85rem;font-weight:700;margin-bottom:3px}
+
+/* ---------- Toast, Konfetti, Sonstiges ---------- */
+#toast{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);
+  background:var(--ink);color:#fff;padding:12px 22px;border-radius:99px;
+  font-weight:800;z-index:100;transition:transform .3s ease;max-width:90vw;text-align:center;
+}
+#toast.show{transform:translateX(-50%) translateY(0)}
+.confetti{position:fixed;top:-12px;width:10px;height:14px;z-index:99;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.8}}
+@keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+.pop{animation:pop .35s ease}
+.star8{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:64px;height:64px;background:var(--saffron);color:#4A3403;font-weight:900;font-size:1.3rem;
+  clip-path:polygon(50% 0%,61% 24%,85% 15%,76% 39%,100% 50%,76% 61%,85% 85%,61% 76%,50% 100%,39% 76%,15% 85%,24% 61%,0% 50%,24% 39%,15% 15%,39% 24%);
+}
+.center{text-align:center}
+.spacer{height:8px}
+.sound-toggle{position:fixed;right:14px;bottom:14px;z-index:60;width:52px;height:52px;border-radius:50%;border:none;background:var(--card);box-shadow:var(--shadow);font-size:1.3rem;cursor:pointer}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="head-row">
+    <button id="btn-home" onclick="go('home')" aria-label="Startseite">🏠</button>
+    <h1>Spanisch Fiesta 💃 <span style="font-size:.7rem;opacity:.7;font-weight:400">v1</span></h1>
+    <div class="pill streak">🔥 <span id="hdr-streak">0</span></div>
+    <div class="pill">⭐ Lv. <span id="hdr-level">1</span></div>
+  </div>
+  <div class="xpbar"><div id="hdr-xpfill" style="width:0%"></div></div>
+  <div class="xp-label"><span id="hdr-xp">0 XP</span><span id="hdr-xpnext"></span></div>
+</header>
+<main id="app"></main>
+<button class="sound-toggle" id="sound-toggle" onclick="toggleSound()" aria-label="Ton an/aus">🔊</button>
+<div id="toast"></div>
+<script>
+"use strict";
+/* =====================================================================
+   VOKABEL-DATENBANK
+   ---------------------------------------------------------------------
+   Struktur: { d: "deutsches Wort", f: "spanisches Wort", c: "Kategorie" }
+   Aktuell enthalten: ca. 600 Vokabeln.
+   >>> WEITERE VOKABELN ERGÄNZEN: einfach unten in der jeweiligen
+   >>> Kategorie neue Zeilen im gleichen Format hinzufügen – der Rest
+   >>> der App passt sich automatisch an (Ziel: 1000+).
+   ===================================================================== */
+const VOCAB = [
+/* --- Zahlen --- */
+{d:"null",f:"cero",c:"Zahlen"},{d:"eins",f:"uno",c:"Zahlen"},{d:"zwei",f:"dos",c:"Zahlen"},{d:"drei",f:"tres",c:"Zahlen"},
+{d:"vier",f:"cuatro",c:"Zahlen"},{d:"fünf",f:"cinco",c:"Zahlen"},{d:"sechs",f:"seis",c:"Zahlen"},{d:"sieben",f:"siete",c:"Zahlen"},
+{d:"acht",f:"ocho",c:"Zahlen"},{d:"neun",f:"nueve",c:"Zahlen"},{d:"zehn",f:"diez",c:"Zahlen"},{d:"elf",f:"once",c:"Zahlen"},
+{d:"zwölf",f:"doce",c:"Zahlen"},{d:"dreizehn",f:"trece",c:"Zahlen"},{d:"vierzehn",f:"catorce",c:"Zahlen"},{d:"fünfzehn",f:"quince",c:"Zahlen"},
+{d:"sechzehn",f:"dieciséis",c:"Zahlen"},{d:"siebzehn",f:"diecisiete",c:"Zahlen"},{d:"achtzehn",f:"dieciocho",c:"Zahlen"},{d:"neunzehn",f:"diecinueve",c:"Zahlen"},
+{d:"zwanzig",f:"veinte",c:"Zahlen"},{d:"dreißig",f:"treinta",c:"Zahlen"},{d:"vierzig",f:"cuarenta",c:"Zahlen"},{d:"fünfzig",f:"cincuenta",c:"Zahlen"},
+{d:"sechzig",f:"sesenta",c:"Zahlen"},{d:"siebzig",f:"setenta",c:"Zahlen"},{d:"achtzig",f:"ochenta",c:"Zahlen"},{d:"neunzig",f:"noventa",c:"Zahlen"},
+{d:"hundert",f:"cien",c:"Zahlen"},{d:"tausend",f:"mil",c:"Zahlen"},{d:"Million",f:"millón",c:"Zahlen"},{d:"erste/r",f:"primero",c:"Zahlen"},
+{d:"letzte/r",f:"último",c:"Zahlen"},{d:"halb",f:"medio",c:"Zahlen"},{d:"Zahl",f:"número",c:"Zahlen"},
+/* --- Farben --- */
+{d:"Farbe",f:"color",c:"Farben"},{d:"rot",f:"rojo",c:"Farben"},{d:"blau",f:"azul",c:"Farben"},{d:"grün",f:"verde",c:"Farben"},
+{d:"gelb",f:"amarillo",c:"Farben"},{d:"schwarz",f:"negro",c:"Farben"},{d:"weiß",f:"blanco",c:"Farben"},{d:"orange (Farbe)",f:"naranja",c:"Farben"},
+{d:"rosa",f:"rosa",c:"Farben"},{d:"lila",f:"morado",c:"Farben"},{d:"braun",f:"marrón",c:"Farben"},{d:"grau",f:"gris",c:"Farben"},
+{d:"golden",f:"dorado",c:"Farben"},{d:"silbern",f:"plateado",c:"Farben"},
+/* --- Familie --- */
+{d:"Familie",f:"familia",c:"Familie"},{d:"Mutter",f:"madre",c:"Familie"},{d:"Vater",f:"padre",c:"Familie"},{d:"Eltern",f:"padres",c:"Familie"},
+{d:"Bruder",f:"hermano",c:"Familie"},{d:"Schwester",f:"hermana",c:"Familie"},{d:"Sohn",f:"hijo",c:"Familie"},{d:"Tochter",f:"hija",c:"Familie"},
+{d:"Kind",f:"niño",c:"Familie"},{d:"Baby",f:"bebé",c:"Familie"},{d:"Großmutter",f:"abuela",c:"Familie"},{d:"Großvater",f:"abuelo",c:"Familie"},
+{d:"Onkel",f:"tío",c:"Familie"},{d:"Tante",f:"tía",c:"Familie"},{d:"Cousin",f:"primo",c:"Familie"},{d:"Cousine",f:"prima",c:"Familie"},
+{d:"Ehemann",f:"marido",c:"Familie"},{d:"Ehefrau",f:"esposa",c:"Familie"},{d:"Frau",f:"mujer",c:"Familie"},{d:"Mann",f:"hombre",c:"Familie"},
+{d:"Enkelkind",f:"nieto",c:"Familie"},{d:"Verwandte",f:"parientes",c:"Familie"},{d:"Zwillinge",f:"gemelos",c:"Familie"},{d:"Mädchen",f:"chica",c:"Familie"},
+/* --- Begrüßung & Höflichkeit --- */
+{d:"hallo",f:"hola",c:"Begrüßung & Höflichkeit"},{d:"guten Morgen",f:"buenos días",c:"Begrüßung & Höflichkeit"},{d:"guten Abend",f:"buenas tardes",c:"Begrüßung & Höflichkeit"},{d:"gute Nacht",f:"buenas noches",c:"Begrüßung & Höflichkeit"},
+{d:"auf Wiedersehen",f:"adiós",c:"Begrüßung & Höflichkeit"},{d:"bis später",f:"hasta luego",c:"Begrüßung & Höflichkeit"},{d:"danke",f:"gracias",c:"Begrüßung & Höflichkeit"},{d:"vielen Dank",f:"muchas gracias",c:"Begrüßung & Höflichkeit"},
+{d:"bitte (Bitte um etwas)",f:"por favor",c:"Begrüßung & Höflichkeit"},{d:"gern geschehen",f:"de nada",c:"Begrüßung & Höflichkeit"},{d:"ja",f:"sí",c:"Begrüßung & Höflichkeit"},{d:"nein",f:"no",c:"Begrüßung & Höflichkeit"},
+{d:"Entschuldigung",f:"perdón",c:"Begrüßung & Höflichkeit"},{d:"Wie geht es dir?",f:"cómo estás",c:"Begrüßung & Höflichkeit"},{d:"Mir geht es gut",f:"estoy bien",c:"Begrüßung & Höflichkeit"},{d:"willkommen",f:"bienvenido",c:"Begrüßung & Höflichkeit"},
+{d:"Freut mich (dich kennenzulernen)",f:"mucho gusto",c:"Begrüßung & Höflichkeit"},{d:"Herr",f:"señor",c:"Begrüßung & Höflichkeit"},{d:"Frau (Anrede)",f:"señora",c:"Begrüßung & Höflichkeit"},{d:"Freund/in",f:"amigo",c:"Begrüßung & Höflichkeit"},
+{d:"Name",f:"nombre",c:"Begrüßung & Höflichkeit"},{d:"okay / in Ordnung",f:"vale",c:"Begrüßung & Höflichkeit"},{d:"Prost / zum Wohl",f:"salud",c:"Begrüßung & Höflichkeit"},{d:"Glückwunsch",f:"felicidades",c:"Begrüßung & Höflichkeit"},
+{d:"kein Problem",f:"no hay problema",c:"Begrüßung & Höflichkeit"},{d:"sehr gut / bravo",f:"muy bien",c:"Begrüßung & Höflichkeit"},{d:"Gast",f:"invitado",c:"Begrüßung & Höflichkeit"},{d:"Nachbar",f:"vecino",c:"Begrüßung & Höflichkeit"},
+/* --- Essen & Trinken --- */
+{d:"Essen",f:"comida",c:"Essen & Trinken"},{d:"Brot",f:"pan",c:"Essen & Trinken"},{d:"Wasser",f:"agua",c:"Essen & Trinken"},{d:"Tee",f:"té",c:"Essen & Trinken"},
+{d:"Kaffee",f:"café",c:"Essen & Trinken"},{d:"Milch",f:"leche",c:"Essen & Trinken"},{d:"Zucker",f:"azúcar",c:"Essen & Trinken"},{d:"Salz",f:"sal",c:"Essen & Trinken"},
+{d:"Pfeffer",f:"pimienta",c:"Essen & Trinken"},{d:"Reis",f:"arroz",c:"Essen & Trinken"},{d:"Fleisch",f:"carne",c:"Essen & Trinken"},{d:"Hähnchen",f:"pollo",c:"Essen & Trinken"},
+{d:"Fisch (Essen)",f:"pescado",c:"Essen & Trinken"},{d:"Ei",f:"huevo",c:"Essen & Trinken"},{d:"Käse",f:"queso",c:"Essen & Trinken"},{d:"Butter",f:"mantequilla",c:"Essen & Trinken"},
+{d:"Joghurt",f:"yogur",c:"Essen & Trinken"},{d:"Obst",f:"fruta",c:"Essen & Trinken"},{d:"Apfel",f:"manzana",c:"Essen & Trinken"},{d:"Orange (Frucht)",f:"naranja",c:"Essen & Trinken"},
+{d:"Banane",f:"plátano",c:"Essen & Trinken"},{d:"Traube",f:"uva",c:"Essen & Trinken"},{d:"Wassermelone",f:"sandía",c:"Essen & Trinken"},{d:"Melone",f:"melón",c:"Essen & Trinken"},
+{d:"Granatapfel",f:"granada",c:"Essen & Trinken"},{d:"Kirsche",f:"cereza",c:"Essen & Trinken"},{d:"Erdbeere",f:"fresa",c:"Essen & Trinken"},{d:"Pfirsich",f:"melocotón",c:"Essen & Trinken"},
+{d:"Birne",f:"pera",c:"Essen & Trinken"},{d:"Zitrone",f:"limón",c:"Essen & Trinken"},{d:"Gemüse",f:"verdura",c:"Essen & Trinken"},{d:"Tomate",f:"tomate",c:"Essen & Trinken"},
+{d:"Gurke",f:"pepino",c:"Essen & Trinken"},{d:"Kartoffel",f:"patata",c:"Essen & Trinken"},{d:"Zwiebel",f:"cebolla",c:"Essen & Trinken"},{d:"Knoblauch",f:"ajo",c:"Essen & Trinken"},
+{d:"Karotte",f:"zanahoria",c:"Essen & Trinken"},{d:"Salat",f:"ensalada",c:"Essen & Trinken"},{d:"Suppe",f:"sopa",c:"Essen & Trinken"},{d:"Nudeln",f:"pasta",c:"Essen & Trinken"},
+{d:"Honig",f:"miel",c:"Essen & Trinken"},{d:"Marmelade",f:"mermelada",c:"Essen & Trinken"},{d:"Kuchen",f:"pastel",c:"Essen & Trinken"},{d:"Süßigkeiten",f:"dulces",c:"Essen & Trinken"},
+{d:"Speiseeis",f:"helado",c:"Essen & Trinken"},{d:"Saft",f:"zumo",c:"Essen & Trinken"},{d:"Nüsse",f:"frutos secos",c:"Essen & Trinken"},{d:"Walnuss",f:"nuez",c:"Essen & Trinken"},
+{d:"Frühstück",f:"desayuno",c:"Essen & Trinken"},{d:"Mittagessen",f:"almuerzo",c:"Essen & Trinken"},{d:"Abendessen",f:"cena",c:"Essen & Trinken"},{d:"hungrig",f:"hambriento",c:"Essen & Trinken"},
+{d:"durstig",f:"sediento",c:"Essen & Trinken"},{d:"lecker",f:"rico",c:"Essen & Trinken"},{d:"vegetarisch / Vegetarier",f:"vegetariano",c:"Essen & Trinken"},{d:"Restaurant",f:"restaurante",c:"Essen & Trinken"},
+/* --- Körper --- */
+{d:"Körper",f:"cuerpo",c:"Körper"},{d:"Kopf",f:"cabeza",c:"Körper"},{d:"Gesicht",f:"cara",c:"Körper"},{d:"Auge",f:"ojo",c:"Körper"},
+{d:"Ohr",f:"oreja",c:"Körper"},{d:"Nase",f:"nariz",c:"Körper"},{d:"Mund",f:"boca",c:"Körper"},{d:"Zahn",f:"diente",c:"Körper"},
+{d:"Lippe",f:"labio",c:"Körper"},{d:"Haar",f:"pelo",c:"Körper"},{d:"Hals",f:"cuello",c:"Körper"},{d:"Schulter",f:"hombro",c:"Körper"},
+{d:"Arm",f:"brazo",c:"Körper"},{d:"Hand",f:"mano",c:"Körper"},{d:"Finger",f:"dedo",c:"Körper"},{d:"Bauch",f:"barriga",c:"Körper"},
+{d:"Rücken",f:"espalda",c:"Körper"},{d:"Bein",f:"pierna",c:"Körper"},{d:"Fuß",f:"pie",c:"Körper"},{d:"Knie",f:"rodilla",c:"Körper"},
+{d:"Herz",f:"corazón",c:"Körper"},{d:"Blut",f:"sangre",c:"Körper"},{d:"Haut",f:"piel",c:"Körper"},{d:"Knochen",f:"hueso",c:"Körper"},
+{d:"Zunge",f:"lengua",c:"Körper"},{d:"Gehirn",f:"cerebro",c:"Körper"},{d:"Gesundheit",f:"salud",c:"Körper"},
+/* --- Kleidung --- */
+{d:"Kleidung",f:"ropa",c:"Kleidung"},{d:"Hemd",f:"camisa",c:"Kleidung"},{d:"Hose",f:"pantalón",c:"Kleidung"},{d:"Rock",f:"falda",c:"Kleidung"},
+{d:"Mantel",f:"abrigo",c:"Kleidung"},{d:"Jacke",f:"chaqueta",c:"Kleidung"},{d:"Pullover",f:"jersey",c:"Kleidung"},{d:"Schuh",f:"zapato",c:"Kleidung"},
+{d:"Socke",f:"calcetín",c:"Kleidung"},{d:"Hut / Mütze",f:"gorro",c:"Kleidung"},{d:"Schal",f:"bufanda",c:"Kleidung"},{d:"Handschuh",f:"guante",c:"Kleidung"},
+{d:"Gürtel",f:"cinturón",c:"Kleidung"},{d:"Tasche",f:"bolso",c:"Kleidung"},{d:"Brille",f:"gafas",c:"Kleidung"},{d:"Armbanduhr",f:"reloj",c:"Kleidung"},
+{d:"Ring",f:"anillo",c:"Kleidung"},{d:"T-Shirt",f:"camiseta",c:"Kleidung"},{d:"Unterwäsche",f:"ropa interior",c:"Kleidung"},{d:"Knopf",f:"botón",c:"Kleidung"},
+{d:"Reißverschluss",f:"cremallera",c:"Kleidung"},{d:"Krawatte",f:"corbata",c:"Kleidung"},
+/* --- Haus & Möbel --- */
+{d:"Haus",f:"casa",c:"Haus & Möbel"},{d:"Wohnung",f:"piso",c:"Haus & Möbel"},{d:"Zimmer",f:"habitación",c:"Haus & Möbel"},{d:"Küche",f:"cocina",c:"Haus & Möbel"},
+{d:"Bad",f:"baño",c:"Haus & Möbel"},{d:"Toilette",f:"aseo",c:"Haus & Möbel"},{d:"Schlafzimmer",f:"dormitorio",c:"Haus & Möbel"},{d:"Wohnzimmer",f:"salón",c:"Haus & Möbel"},
+{d:"Tür",f:"puerta",c:"Haus & Möbel"},{d:"Fenster",f:"ventana",c:"Haus & Möbel"},{d:"Wand",f:"pared",c:"Haus & Möbel"},{d:"Fußboden",f:"suelo",c:"Haus & Möbel"},
+{d:"Dach",f:"tejado",c:"Haus & Möbel"},{d:"Zimmerdecke",f:"techo",c:"Haus & Möbel"},{d:"Treppe",f:"escalera",c:"Haus & Möbel"},{d:"Schlüssel",f:"llave",c:"Haus & Möbel"},
+{d:"Tisch",f:"mesa",c:"Haus & Möbel"},{d:"Stuhl",f:"silla",c:"Haus & Möbel"},{d:"Bett",f:"cama",c:"Haus & Möbel"},{d:"Sofa",f:"sofá",c:"Haus & Möbel"},
+{d:"Schrank",f:"armario",c:"Haus & Möbel"},{d:"Regal",f:"estantería",c:"Haus & Möbel"},{d:"Lampe",f:"lámpara",c:"Haus & Möbel"},{d:"Spiegel",f:"espejo",c:"Haus & Möbel"},
+{d:"Teppich",f:"alfombra",c:"Haus & Möbel"},{d:"Kissen",f:"almohada",c:"Haus & Möbel"},{d:"Bettdecke",f:"manta",c:"Haus & Möbel"},{d:"Kühlschrank",f:"nevera",c:"Haus & Möbel"},
+{d:"Herd",f:"fogón",c:"Haus & Möbel"},{d:"Waschmaschine",f:"lavadora",c:"Haus & Möbel"},{d:"Fernseher",f:"televisor",c:"Haus & Möbel"},{d:"Garten",f:"jardín",c:"Haus & Möbel"},
+{d:"Hof",f:"patio",c:"Haus & Möbel"},
+/* --- Tiere --- */
+{d:"Tier",f:"animal",c:"Tiere"},{d:"Hund",f:"perro",c:"Tiere"},{d:"Katze",f:"gato",c:"Tiere"},{d:"Vogel",f:"pájaro",c:"Tiere"},
+{d:"Pferd",f:"caballo",c:"Tiere"},{d:"Kuh",f:"vaca",c:"Tiere"},{d:"Schaf",f:"oveja",c:"Tiere"},{d:"Ziege",f:"cabra",c:"Tiere"},
+{d:"Hahn",f:"gallo",c:"Tiere"},{d:"Esel",f:"burro",c:"Tiere"},{d:"Kamel",f:"camello",c:"Tiere"},{d:"Löwe",f:"león",c:"Tiere"},
+{d:"Tiger",f:"tigre",c:"Tiere"},{d:"Bär",f:"oso",c:"Tiere"},{d:"Wolf",f:"lobo",c:"Tiere"},{d:"Fuchs",f:"zorro",c:"Tiere"},
+{d:"Hase / Kaninchen",f:"conejo",c:"Tiere"},{d:"Maus",f:"ratón",c:"Tiere"},{d:"Elefant",f:"elefante",c:"Tiere"},{d:"Affe",f:"mono",c:"Tiere"},
+{d:"Schlange",f:"serpiente",c:"Tiere"},{d:"Spinne",f:"araña",c:"Tiere"},{d:"Fliege",f:"mosca",c:"Tiere"},{d:"Biene",f:"abeja",c:"Tiere"},
+{d:"Ameise",f:"hormiga",c:"Tiere"},{d:"Schmetterling",f:"mariposa",c:"Tiere"},{d:"Ente",f:"pato",c:"Tiere"},{d:"Adler",f:"águila",c:"Tiere"},
+{d:"Schildkröte",f:"tortuga",c:"Tiere"},{d:"Frosch",f:"rana",c:"Tiere"},
+/* --- Natur --- */
+{d:"Natur",f:"naturaleza",c:"Natur"},{d:"Sonne",f:"sol",c:"Natur"},{d:"Mond",f:"luna",c:"Natur"},{d:"Stern",f:"estrella",c:"Natur"},
+{d:"Himmel",f:"cielo",c:"Natur"},{d:"Wolke",f:"nube",c:"Natur"},{d:"Regen",f:"lluvia",c:"Natur"},{d:"Schnee",f:"nieve",c:"Natur"},
+{d:"Wind",f:"viento",c:"Natur"},{d:"Sturm",f:"tormenta",c:"Natur"},{d:"Gewitter",f:"tormenta eléctrica",c:"Natur"},{d:"Feuer",f:"fuego",c:"Natur"},
+{d:"Erde / Boden",f:"tierra",c:"Natur"},{d:"Meer",f:"mar",c:"Natur"},{d:"See",f:"lago",c:"Natur"},{d:"Fluss",f:"río",c:"Natur"},
+{d:"Berg",f:"montaña",c:"Natur"},{d:"Wald",f:"bosque",c:"Natur"},{d:"Wüste",f:"desierto",c:"Natur"},{d:"Baum",f:"árbol",c:"Natur"},
+{d:"Blume",f:"flor",c:"Natur"},{d:"Gras",f:"hierba",c:"Natur"},{d:"Blatt",f:"hoja",c:"Natur"},{d:"Stein",f:"piedra",c:"Natur"},
+{d:"Sand",f:"arena",c:"Natur"},{d:"Insel",f:"isla",c:"Natur"},{d:"Strand / Küste",f:"playa",c:"Natur"},{d:"Luft",f:"aire",c:"Natur"},
+{d:"Wetter",f:"tiempo",c:"Natur"},{d:"Regenbogen",f:"arcoíris",c:"Natur"},
+/* --- Zeit & Kalender --- */
+{d:"Zeit",f:"tiempo",c:"Zeit & Kalender"},{d:"Stunde / Uhr(zeit)",f:"hora",c:"Zeit & Kalender"},{d:"Minute",f:"minuto",c:"Zeit & Kalender"},{d:"Sekunde",f:"segundo",c:"Zeit & Kalender"},
+{d:"Tag",f:"día",c:"Zeit & Kalender"},{d:"Nacht",f:"noche",c:"Zeit & Kalender"},{d:"Morgen (Tageszeit)",f:"mañana",c:"Zeit & Kalender"},{d:"Mittag",f:"mediodía",c:"Zeit & Kalender"},
+{d:"Nachmittag / Abend",f:"tarde",c:"Zeit & Kalender"},{d:"heute",f:"hoy",c:"Zeit & Kalender"},{d:"gestern",f:"ayer",c:"Zeit & Kalender"},{d:"morgen",f:"mañana",c:"Zeit & Kalender"},
+{d:"übermorgen",f:"pasado mañana",c:"Zeit & Kalender"},{d:"vorgestern",f:"anteayer",c:"Zeit & Kalender"},{d:"Woche",f:"semana",c:"Zeit & Kalender"},{d:"Monat",f:"mes",c:"Zeit & Kalender"},
+{d:"Jahr",f:"año",c:"Zeit & Kalender"},{d:"Jahrhundert",f:"siglo",c:"Zeit & Kalender"},{d:"Montag",f:"lunes",c:"Zeit & Kalender"},{d:"Dienstag",f:"martes",c:"Zeit & Kalender"},
+{d:"Mittwoch",f:"miércoles",c:"Zeit & Kalender"},{d:"Donnerstag",f:"jueves",c:"Zeit & Kalender"},{d:"Freitag",f:"viernes",c:"Zeit & Kalender"},{d:"Samstag",f:"sábado",c:"Zeit & Kalender"},
+{d:"Sonntag",f:"domingo",c:"Zeit & Kalender"},{d:"Frühling",f:"primavera",c:"Zeit & Kalender"},{d:"Sommer",f:"verano",c:"Zeit & Kalender"},{d:"Herbst",f:"otoño",c:"Zeit & Kalender"},
+{d:"Winter",f:"invierno",c:"Zeit & Kalender"},{d:"jetzt",f:"ahora",c:"Zeit & Kalender"},{d:"später",f:"después",c:"Zeit & Kalender"},{d:"früh",f:"temprano",c:"Zeit & Kalender"},
+{d:"spät",f:"tarde",c:"Zeit & Kalender"},{d:"immer",f:"siempre",c:"Zeit & Kalender"},{d:"nie",f:"nunca",c:"Zeit & Kalender"},{d:"manchmal",f:"a veces",c:"Zeit & Kalender"},
+{d:"Kalender",f:"calendario",c:"Zeit & Kalender"},{d:"Datum",f:"fecha",c:"Zeit & Kalender"},{d:"Geburtstag",f:"cumpleaños",c:"Zeit & Kalender"},
+/* --- Verben --- */
+{d:"sein",f:"ser",c:"Verben"},{d:"haben",f:"tener",c:"Verben"},{d:"gehen",f:"ir",c:"Verben"},{d:"kommen",f:"venir",c:"Verben"},
+{d:"machen / tun",f:"hacer",c:"Verben"},{d:"sagen",f:"decir",c:"Verben"},{d:"sehen",f:"ver",c:"Verben"},{d:"hören",f:"oír",c:"Verben"},
+{d:"sprechen / reden",f:"hablar",c:"Verben"},{d:"essen",f:"comer",c:"Verben"},{d:"trinken",f:"beber",c:"Verben"},{d:"schlafen",f:"dormir",c:"Verben"},
+{d:"aufwachen",f:"despertarse",c:"Verben"},{d:"aufstehen",f:"levantarse",c:"Verben"},{d:"sich setzen",f:"sentarse",c:"Verben"},{d:"stehen",f:"estar de pie",c:"Verben"},
+{d:"rennen / laufen",f:"correr",c:"Verben"},{d:"schwimmen",f:"nadar",c:"Verben"},{d:"fliegen",f:"volar",c:"Verben"},{d:"Auto fahren",f:"conducir",c:"Verben"},
+{d:"kaufen",f:"comprar",c:"Verben"},{d:"verkaufen",f:"vender",c:"Verben"},{d:"bezahlen",f:"pagar",c:"Verben"},{d:"geben",f:"dar",c:"Verben"},
+{d:"nehmen",f:"tomar",c:"Verben"},{d:"bringen",f:"traer",c:"Verben"},{d:"finden",f:"encontrar",c:"Verben"},{d:"suchen",f:"buscar",c:"Verben"},
+{d:"verlieren (Sache)",f:"perder",c:"Verben"},{d:"öffnen",f:"abrir",c:"Verben"},{d:"schließen",f:"cerrar",c:"Verben"},{d:"beginnen",f:"empezar",c:"Verben"},
+{d:"beenden",f:"terminar",c:"Verben"},{d:"arbeiten",f:"trabajar",c:"Verben"},{d:"lernen",f:"aprender",c:"Verben"},{d:"beibringen / lehren",f:"enseñar",c:"Verben"},
+{d:"lesen",f:"leer",c:"Verben"},{d:"schreiben",f:"escribir",c:"Verben"},{d:"verstehen",f:"entender",c:"Verben"},{d:"wissen",f:"saber",c:"Verben"},
+{d:"denken",f:"pensar",c:"Verben"},{d:"glauben",f:"creer",c:"Verben"},{d:"lieben",f:"amar",c:"Verben"},{d:"wollen",f:"querer",c:"Verben"},
+{d:"können",f:"poder",c:"Verben"},{d:"müssen",f:"deber",c:"Verben"},{d:"fragen",f:"preguntar",c:"Verben"},{d:"antworten",f:"responder",c:"Verben"},
+{d:"helfen",f:"ayudar",c:"Verben"},{d:"warten",f:"esperar",c:"Verben"},{d:"spielen",f:"jugar",c:"Verben"},{d:"lachen",f:"reír",c:"Verben"},
+{d:"weinen",f:"llorar",c:"Verben"},{d:"singen",f:"cantar",c:"Verben"},{d:"tanzen",f:"bailar",c:"Verben"},{d:"kochen",f:"cocinar",c:"Verben"},
+{d:"waschen",f:"lavar",c:"Verben"},{d:"putzen",f:"limpiar",c:"Verben"},{d:"anziehen",f:"ponerse",c:"Verben"},{d:"ausziehen",f:"quitarse",c:"Verben"},
+{d:"wohnen / leben",f:"vivir",c:"Verben"},{d:"sterben",f:"morir",c:"Verben"},{d:"reisen",f:"viajar",c:"Verben"},{d:"ankommen",f:"llegar",c:"Verben"},
+{d:"losfahren / aufbrechen",f:"salir",c:"Verben"},{d:"bleiben",f:"quedarse",c:"Verben"},{d:"zurückkehren",f:"volver",c:"Verben"},{d:"schicken",f:"enviar",c:"Verben"},
+{d:"anrufen",f:"llamar",c:"Verben"},{d:"zeigen",f:"mostrar",c:"Verben"},{d:"erklären",f:"explicar",c:"Verben"},{d:"vergessen",f:"olvidar",c:"Verben"},
+{d:"sich erinnern",f:"recordar",c:"Verben"},{d:"versuchen",f:"intentar",c:"Verben"},{d:"brauchen",f:"necesitar",c:"Verben"},{d:"hoffen",f:"esperar",c:"Verben"},
+{d:"bauen",f:"construir",c:"Verben"},{d:"zerbrechen",f:"romper",c:"Verben"},{d:"schneiden",f:"cortar",c:"Verben"},{d:"ziehen",f:"tirar",c:"Verben"},
+{d:"drücken / schieben",f:"empujar",c:"Verben"},{d:"werfen",f:"lanzar",c:"Verben"},{d:"riechen",f:"oler",c:"Verben"},{d:"fühlen",f:"sentir",c:"Verben"},
+{d:"sich treffen",f:"encontrarse",c:"Verben"},{d:"heiraten",f:"casarse",c:"Verben"},{d:"gewinnen",f:"ganar",c:"Verben"},{d:"verlieren (Spiel)",f:"perder",c:"Verben"},
+/* --- Adjektive --- */
+{d:"gut",f:"bueno",c:"Adjektive"},{d:"schlecht",f:"malo",c:"Adjektive"},{d:"groß",f:"grande",c:"Adjektive"},{d:"klein",f:"pequeño",c:"Adjektive"},
+{d:"lang",f:"largo",c:"Adjektive"},{d:"hoch / groß (Person)",f:"alto",c:"Adjektive"},{d:"kurz",f:"corto",c:"Adjektive"},{d:"neu",f:"nuevo",c:"Adjektive"},
+{d:"alt (Sache)",f:"viejo",c:"Adjektive"},{d:"alt (Person)",f:"mayor",c:"Adjektive"},{d:"jung",f:"joven",c:"Adjektive"},{d:"schön",f:"bonito",c:"Adjektive"},
+{d:"hässlich",f:"feo",c:"Adjektive"},{d:"schnell",f:"rápido",c:"Adjektive"},{d:"scharf (Essen)",f:"picante",c:"Adjektive"},{d:"langsam",f:"lento",c:"Adjektive"},
+{d:"stark",f:"fuerte",c:"Adjektive"},{d:"schwach",f:"débil",c:"Adjektive"},{d:"schwer (Gewicht)",f:"pesado",c:"Adjektive"},{d:"leicht (Gewicht)",f:"ligero",c:"Adjektive"},
+{d:"schwierig",f:"difícil",c:"Adjektive"},{d:"einfach",f:"fácil",c:"Adjektive"},{d:"heiß",f:"caliente",c:"Adjektive"},{d:"warm",f:"cálido",c:"Adjektive"},
+{d:"kalt",f:"frío",c:"Adjektive"},{d:"kühl / frisch",f:"fresco",c:"Adjektive"},{d:"nass",f:"mojado",c:"Adjektive"},{d:"trocken",f:"seco",c:"Adjektive"},
+{d:"sauber",f:"limpio",c:"Adjektive"},{d:"schmutzig",f:"sucio",c:"Adjektive"},{d:"voll",f:"lleno",c:"Adjektive"},{d:"leer",f:"vacío",c:"Adjektive"},
+{d:"teuer",f:"caro",c:"Adjektive"},{d:"billig",f:"barato",c:"Adjektive"},{d:"reich",f:"rico",c:"Adjektive"},{d:"arm",f:"pobre",c:"Adjektive"},
+{d:"krank",f:"enfermo",c:"Adjektive"},{d:"gesund",f:"sano",c:"Adjektive"},{d:"richtig",f:"correcto",c:"Adjektive"},{d:"falsch",f:"falso",c:"Adjektive"},
+{d:"wichtig",f:"importante",c:"Adjektive"},{d:"interessant",f:"interesante",c:"Adjektive"},{d:"langweilig",f:"aburrido",c:"Adjektive"},{d:"leise / ruhig",f:"tranquilo",c:"Adjektive"},
+{d:"laut",f:"ruidoso",c:"Adjektive"},{d:"hell",f:"claro",c:"Adjektive"},{d:"dunkel",f:"oscuro",c:"Adjektive"},{d:"süß",f:"dulce",c:"Adjektive"},
+{d:"sauer",f:"agrio",c:"Adjektive"},{d:"salzig",f:"salado",c:"Adjektive"},{d:"bitter",f:"amargo",c:"Adjektive"},{d:"weit entfernt",f:"lejos",c:"Adjektive"},
+{d:"nah",f:"cerca",c:"Adjektive"},{d:"breit",f:"ancho",c:"Adjektive"},{d:"eng",f:"estrecho",c:"Adjektive"},{d:"tief",f:"profundo",c:"Adjektive"},
+{d:"frei",f:"libre",c:"Adjektive"},{d:"beschäftigt",f:"ocupado",c:"Adjektive"},{d:"gefährlich",f:"peligroso",c:"Adjektive"},{d:"sicher",f:"seguro",c:"Adjektive"},
+{d:"möglich",f:"posible",c:"Adjektive"},{d:"bereit / fertig",f:"listo",c:"Adjektive"},{d:"dick",f:"gordo",c:"Adjektive"},{d:"dünn / schlank",f:"delgado",c:"Adjektive"},
+{d:"offen",f:"abierto",c:"Adjektive"},{d:"geschlossen",f:"cerrado",c:"Adjektive"},
+/* --- Fragewörter --- */
+{d:"was",f:"qué",c:"Fragewörter"},{d:"wer",f:"quién",c:"Fragewörter"},{d:"wo",f:"dónde",c:"Fragewörter"},{d:"wann",f:"cuándo",c:"Fragewörter"},
+{d:"warum",f:"por qué",c:"Fragewörter"},{d:"wie",f:"cómo",c:"Fragewörter"},{d:"wie viel",f:"cuánto",c:"Fragewörter"},{d:"wie viele",f:"cuántos",c:"Fragewörter"},
+{d:"welche/r",f:"cuál",c:"Fragewörter"},{d:"woher",f:"de dónde",c:"Fragewörter"},{d:"wohin",f:"adónde",c:"Fragewörter"},{d:"wessen",f:"de quién",c:"Fragewörter"},
+/* --- Reisen & Verkehr --- */
+{d:"Reise",f:"viaje",c:"Reisen & Verkehr"},{d:"Auto",f:"coche",c:"Reisen & Verkehr"},{d:"Bus",f:"autobús",c:"Reisen & Verkehr"},{d:"Zug",f:"tren",c:"Reisen & Verkehr"},
+{d:"Flugzeug",f:"avión",c:"Reisen & Verkehr"},{d:"Fahrrad",f:"bicicleta",c:"Reisen & Verkehr"},{d:"Motorrad",f:"moto",c:"Reisen & Verkehr"},{d:"Taxi",f:"taxi",c:"Reisen & Verkehr"},
+{d:"Schiff",f:"barco",c:"Reisen & Verkehr"},{d:"Bahnhof",f:"estación de tren",c:"Reisen & Verkehr"},{d:"Flughafen",f:"aeropuerto",c:"Reisen & Verkehr"},{d:"Straße",f:"calle",c:"Reisen & Verkehr"},
+{d:"Weg",f:"camino",c:"Reisen & Verkehr"},{d:"Brücke",f:"puente",c:"Reisen & Verkehr"},{d:"Ampel",f:"semáforo",c:"Reisen & Verkehr"},{d:"Ticket / Fahrkarte",f:"billete",c:"Reisen & Verkehr"},
+{d:"Reisepass",f:"pasaporte",c:"Reisen & Verkehr"},{d:"Visum",f:"visado",c:"Reisen & Verkehr"},{d:"Hotel",f:"hotel",c:"Reisen & Verkehr"},{d:"Koffer",f:"maleta",c:"Reisen & Verkehr"},
+{d:"Rucksack",f:"mochila",c:"Reisen & Verkehr"},{d:"Landkarte",f:"mapa",c:"Reisen & Verkehr"},{d:"Stadt",f:"ciudad",c:"Reisen & Verkehr"},{d:"Dorf",f:"pueblo",c:"Reisen & Verkehr"},
+{d:"Land (Staat)",f:"país",c:"Reisen & Verkehr"},{d:"Ausland",f:"extranjero",c:"Reisen & Verkehr"},{d:"Grenze",f:"frontera",c:"Reisen & Verkehr"},{d:"links",f:"izquierda",c:"Reisen & Verkehr"},
+{d:"rechts",f:"derecha",c:"Reisen & Verkehr"},{d:"geradeaus",f:"recto",c:"Reisen & Verkehr"},{d:"Benzin",f:"gasolina",c:"Reisen & Verkehr"},{d:"Parkplatz",f:"aparcamiento",c:"Reisen & Verkehr"},
+/* --- Beruf --- */
+{d:"Beruf",f:"profesión",c:"Beruf"},{d:"Arbeit",f:"trabajo",c:"Beruf"},{d:"Lehrer/in",f:"profesor",c:"Beruf"},{d:"Schüler/in",f:"alumno",c:"Beruf"},
+{d:"Student/in",f:"estudiante",c:"Beruf"},{d:"Arzt / Ärztin",f:"médico",c:"Beruf"},{d:"Krankenpfleger/in",f:"enfermero",c:"Beruf"},{d:"Ingenieur/in",f:"ingeniero",c:"Beruf"},
+{d:"Polizist/in",f:"policía",c:"Beruf"},{d:"Koch / Köchin",f:"cocinero",c:"Beruf"},{d:"Fahrer/in",f:"conductor",c:"Beruf"},{d:"Verkäufer/in",f:"vendedor",c:"Beruf"},
+{d:"Bauer / Bäuerin",f:"agricultor",c:"Beruf"},{d:"Anwalt / Anwältin",f:"abogado",c:"Beruf"},{d:"Schriftsteller/in",f:"escritor",c:"Beruf"},{d:"Künstler/in",f:"artista",c:"Beruf"},
+{d:"Sänger/in",f:"cantante",c:"Beruf"},{d:"Schauspieler/in",f:"actor",c:"Beruf"},{d:"Friseur/in",f:"peluquero",c:"Beruf"},{d:"Bäcker/in",f:"panadero",c:"Beruf"},
+{d:"Chef/in",f:"jefe",c:"Beruf"},{d:"Kollege / Kollegin",f:"colega",c:"Beruf"},{d:"Büro",f:"oficina",c:"Beruf"},{d:"Schule",f:"escuela",c:"Beruf"},
+{d:"Universität",f:"universidad",c:"Beruf"},{d:"Krankenhaus",f:"hospital",c:"Beruf"},{d:"Geschäft / Laden",f:"tienda",c:"Beruf"},{d:"Gehalt",f:"sueldo",c:"Beruf"},
+{d:"Kunde / Kundin",f:"cliente",c:"Beruf"},
+/* --- Gefühle --- */
+{d:"Gefühl",f:"sentimiento",c:"Gefühle"},{d:"Liebe",f:"amor",c:"Gefühle"},{d:"Freude",f:"alegría",c:"Gefühle"},{d:"glücklich",f:"feliz",c:"Gefühle"},
+{d:"traurig",f:"triste",c:"Gefühle"},{d:"müde",f:"cansado",c:"Gefühle"},{d:"Angst",f:"miedo",c:"Gefühle"},{d:"Wut",f:"ira",c:"Gefühle"},
+{d:"wütend",f:"enfadado",c:"Gefühle"},{d:"Hoffnung",f:"esperanza",c:"Gefühle"},{d:"Traum",f:"sueño",c:"Gefühle"},{d:"Überraschung",f:"sorpresa",c:"Gefühle"},
+{d:"Scham / Verlegenheit",f:"vergüenza",c:"Gefühle"},{d:"schüchtern",f:"tímido",c:"Gefühle"},{d:"stolz",f:"orgulloso",c:"Gefühle"},{d:"eifersüchtig / neidisch",f:"celoso",c:"Gefühle"},
+{d:"allein / einsam",f:"solo",c:"Gefühle"},{d:"lustig / witzig",f:"gracioso",c:"Gefühle"},{d:"Sorge",f:"preocupación",c:"Gefühle"},{d:"besorgt",f:"preocupado",c:"Gefühle"},
+{d:"verliebt",f:"enamorado",c:"Gefühle"},{d:"Träne",f:"lágrima",c:"Gefühle"},{d:"Lächeln",f:"sonrisa",c:"Gefühle"},
+/* --- Alltag --- */
+{d:"Ding / Sache",f:"cosa",c:"Alltag"},{d:"Geld",f:"dinero",c:"Alltag"},{d:"Telefon",f:"teléfono",c:"Alltag"},{d:"Handy",f:"móvil",c:"Alltag"},
+{d:"Computer",f:"ordenador",c:"Alltag"},{d:"Internet",f:"internet",c:"Alltag"},{d:"Buch",f:"libro",c:"Alltag"},{d:"Zeitung",f:"periódico",c:"Alltag"},
+{d:"Brief",f:"carta",c:"Alltag"},{d:"Kugelschreiber",f:"bolígrafo",c:"Alltag"},{d:"Bleistift",f:"lápiz",c:"Alltag"},{d:"Papier",f:"papel",c:"Alltag"},
+{d:"Schere",f:"tijeras",c:"Alltag"},{d:"Geschenk",f:"regalo",c:"Alltag"},{d:"Musik",f:"música",c:"Alltag"},{d:"Film",f:"película",c:"Alltag"},
+{d:"Foto",f:"foto",c:"Alltag"},{d:"Spiel",f:"juego",c:"Alltag"},{d:"Ball",f:"pelota",c:"Alltag"},{d:"Sport",f:"deporte",c:"Alltag"},
+{d:"Fußball",f:"fútbol",c:"Alltag"},{d:"Nachricht",f:"mensaje",c:"Alltag"},{d:"Frage",f:"pregunta",c:"Alltag"},{d:"Antwort",f:"respuesta",c:"Alltag"},
+{d:"Wort",f:"palabra",c:"Alltag"},{d:"Sprache",f:"idioma",c:"Alltag"},{d:"Satz",f:"frase",c:"Alltag"},{d:"Stimme",f:"voz",c:"Alltag"},
+{d:"Licht",f:"luz",c:"Alltag"},{d:"Schatten",f:"sombra",c:"Alltag"},{d:"Problem",f:"problema",c:"Alltag"},{d:"Hilfe",f:"ayuda",c:"Alltag"},
+{d:"Idee",f:"idea",c:"Alltag"},{d:"Neuigkeit",f:"noticia",c:"Alltag"},{d:"Ort / Platz",f:"lugar",c:"Alltag"},{d:"Seife",f:"jabón",c:"Alltag"},
+{d:"Zahnbürste",f:"cepillo de dientes",c:"Alltag"},{d:"Handtuch",f:"toalla",c:"Alltag"},{d:"Messer",f:"cuchillo",c:"Alltag"},{d:"Gabel",f:"tenedor",c:"Alltag"},
+{d:"Löffel",f:"cuchara",c:"Alltag"},{d:"Teller",f:"plato",c:"Alltag"},{d:"Glas (Trinkglas)",f:"vaso",c:"Alltag"},{d:"Tasse",f:"taza",c:"Alltag"},
+{d:"Flasche",f:"botella",c:"Alltag"},{d:"Kochtopf",f:"olla",c:"Alltag"},{d:"Müll",f:"basura",c:"Alltag"},{d:"Preis",f:"precio",c:"Alltag"},
+{d:"Markt",f:"mercado",c:"Alltag"},{d:"Apotheke",f:"farmacia",c:"Alltag"},{d:"Medikament",f:"medicamento",c:"Alltag"},{d:"Post",f:"correos",c:"Alltag"},
+{d:"Bank (Geldinstitut)",f:"banco",c:"Alltag"},{d:"Regenschirm",f:"paraguas",c:"Alltag"},{d:"Nummer",f:"número",c:"Alltag"},{d:"Adresse",f:"dirección",c:"Alltag"},
+{d:"Welt",f:"mundo",c:"Alltag"},{d:"Leben",f:"vida",c:"Alltag"},{d:"Tod",f:"muerte",c:"Alltag"},{d:"Gott",f:"dios",c:"Alltag"},
+{d:"Mensch / Person",f:"persona",c:"Alltag"},{d:"Leute",f:"gente",c:"Alltag"},{d:"Warteschlange",f:"cola",c:"Alltag"},{d:"Feiertag",f:"día festivo",c:"Alltag"}
+/* >>> HIER weitere Vokabeln ergänzen (gleiche Struktur, Komma nicht vergessen) <<< */
+];
+
+/* =====================================================================
+   KATEGORIEN & KONSTANTEN
+   ===================================================================== */
+const CAT_ICONS = {
+  "Zahlen":"🔢","Farben":"🎨","Familie":"👨‍👩‍👧","Begrüßung & Höflichkeit":"👋",
+  "Essen & Trinken":"🍲","Körper":"🫀","Kleidung":"👕","Haus & Möbel":"🏠",
+  "Tiere":"🐪","Natur":"🌿","Zeit & Kalender":"🕰️","Verben":"🏃","Adjektive":"✨",
+  "Fragewörter":"❓","Reisen & Verkehr":"✈️","Beruf":"💼","Gefühle":"❤️","Alltag":"🧺"
+};
+const CATS = [...new Set(VOCAB.map(v=>v.c))];
+const DAILY_COUNT = 15;
+const PRAISE = ["¡Muy bien! 👏","Super!","¡Perfecto! 🌟","¡Genial!","Genau richtig!","Weiter so! 🚀","¡Excelente!","¡Olé! 💃"];
+const CHEER_WRONG = ["Kein Problem – beim nächsten Mal!","Fast! Das Wort kommt wieder.","Merk es dir – ¡la próxima vez! 💃","Fehler gehören zum Lernen!"];
+
+/* =====================================================================
+   ZUSTAND (localStorage)
+   ===================================================================== */
+const KEY = "spanischFiestaV1";
+function defaultState(){
+  return { xp:0, streak:0, lastTestDay:null, weeklyDone:null, days:{}, words:{}, badges:[], sound:true, games:{} };
+}
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){ const s = JSON.parse(raw); if(s && typeof s === "object") return Object.assign(defaultState(), s); }
+  }catch(e){}
+  return defaultState();
+}
+let S = load();
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+function dstr(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function todayStr(){ return dstr(new Date()); }
+function yesterdayStr(){ const d=new Date(); d.setDate(d.getDate()-1); return dstr(d); }
+
+function getW(id){
+  if(!S.words[id]) S.words[id] = { s:0, m:false, w:false, lc:null, seen:false };
+  return S.words[id];
+}
+
+/* =====================================================================
+   XP, LEVEL, STREAK, TOAST, KONFETTI, SOUND
+   ===================================================================== */
+function levelInfo(){
+  let l=1, need=100, base=0;
+  while(S.xp >= base+need){ base+=need; l++; need = 100 + (l-1)*50; }
+  return { l:l, cur:S.xp-base, need:need };
+}
+function addXP(n){
+  const before = levelInfo().l;
+  S.xp += n;
+  const after = levelInfo().l;
+  save(); renderHeader();
+  if(after > before){
+    toast("🎉 Level "+after+" erreicht!");
+    confetti(80); sfx("fanfare");
+  }
+}
+function updateDayStreak(){
+  const t = todayStr();
+  if(S.lastTestDay === t) return;
+  S.streak = (S.lastTestDay === yesterdayStr()) ? S.streak+1 : 1;
+  S.lastTestDay = t;
+  save(); renderHeader();
+}
+let toastTimer = null;
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove("show"), 2200);
+}
+function confetti(n){
+  const cols = ["#F2A81D","#14A39A","#2B5FC7","#C33C54","#7BC950"];
+  for(let i=0;i<n;i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random()*100+"vw";
+    c.style.background = cols[Math.floor(Math.random()*cols.length)];
+    c.style.animationDuration = (1.6+Math.random()*1.6)+"s";
+    c.style.borderRadius = Math.random()>.5 ? "50%" : "3px";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 3500);
+  }
+}
+let AC = null;
+function tone(freq, t0, dur, type, vol){
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = type||"sine"; o.frequency.value = freq;
+  g.gain.setValueAtTime(vol||0.15, AC.currentTime+t0);
+  g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime+t0+dur);
+  o.connect(g); g.connect(AC.destination);
+  o.start(AC.currentTime+t0); o.stop(AC.currentTime+t0+dur+0.05);
+}
+function sfx(kind){
+  if(!S.sound) return;
+  try{
+    if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==="suspended") AC.resume();
+    if(kind==="ok"){ tone(660,0,.12); tone(880,.12,.18); }
+    else if(kind==="bad"){ tone(220,0,.25,"square",.08); }
+    else if(kind==="click"){ tone(500,0,.06,"triangle",.08); }
+    else if(kind==="fanfare"){ tone(523,0,.15); tone(659,.15,.15); tone(784,.3,.15); tone(1047,.45,.4); }
+  }catch(e){}
+}
+function toggleSound(){
+  S.sound = !S.sound; save();
+  document.getElementById("sound-toggle").textContent = S.sound ? "🔊" : "🔇";
+  toast(S.sound ? "Ton an" : "Ton aus");
+}
+
+/* =====================================================================
+   ANTWORT-BEWERTUNG (Levenshtein + relative Schwelle)
+   ===================================================================== */
+function norm(s){
+  return String(s).toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[’'ʼ`\-_.]/g,"")
+    .replace(/\s+/g," ").trim();
+}
+function lev(a,b){
+  const m=a.length, n=b.length;
+  if(!m) return n; if(!n) return m;
+  let prev = new Array(n+1), cur = new Array(n+1);
+  for(let j=0;j<=n;j++) prev[j]=j;
+  for(let i=1;i<=m;i++){
+    cur[0]=i;
+    for(let j=1;j<=n;j++){
+      cur[j] = Math.min(prev[j]+1, cur[j-1]+1, prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    }
+    const t=prev; prev=cur; cur=t;
+  }
+  return prev[n];
+}
+/* Ergebnis: "correct" | "similar" | "wrong" */
+function evalAnswer(input, solution){
+  const a = norm(input), b = norm(solution);
+  if(!a) return "wrong";
+  if(a === b) return "correct";
+  const d = lev(a,b);
+  const L = Math.max(a.length, b.length);
+  const thr = L<=4 ? 1 : (L<=7 ? 2 : Math.round(L*0.3));
+  return d <= thr ? "similar" : "wrong";
+}
+
+/* =====================================================================
+   DAILY WORDS – Auswahl & Test-Logik
+   ===================================================================== */
+function usedIds(){
+  const set = new Set();
+  Object.values(S.days).forEach(day => day.ids.forEach(id => set.add(id)));
+  return set;
+}
+function ensureToday(){
+  const t = todayStr();
+  if(S.days[t]) return S.days[t];
+  const used = usedIds();
+  const byCat = {};
+  VOCAB.forEach((v,i)=>{ if(!used.has(i)){ (byCat[v.c] = byCat[v.c]||[]).push(i); } });
+  Object.values(byCat).forEach(arr => shuffle(arr));
+  const cats = shuffle(Object.keys(byCat));
+  const ids = [];
+  let guard = 0;
+  while(ids.length < DAILY_COUNT && guard < 5000){
+    let added = false;
+    for(const c of cats){
+      if(ids.length >= DAILY_COUNT) break;
+      if(byCat[c].length){ ids.push(byCat[c].pop()); added = true; }
+    }
+    if(!added) break;
+    guard++;
+  }
+  S.days[t] = { ids:ids, learned:false, tested:false, res:{} };
+  save();
+  return S.days[t];
+}
+function repeatPool(){
+  const ids = [];
+  Object.keys(S.words).forEach(id=>{
+    const w = S.words[id];
+    if(w.w && !w.m) ids.push(Number(id));
+  });
+  return ids;
+}
+function buildTestSet(){
+  const dayKeys = Object.keys(S.days).sort().reverse().slice(0,3);
+  const set = new Set();
+  dayKeys.forEach(k => S.days[k].ids.forEach(id => set.add(id)));
+  repeatPool().forEach(id => set.add(id));
+  return shuffle([...set]);
+}
+function weekKey(){
+  const d = new Date();
+  const off = (d.getDay()+6)%7; /* Montag als Wochenstart */
+  d.setDate(d.getDate()-off);
+  return dstr(d);
+}
+function weeklySet(){
+  /* 15 zufällige Wörter aus ALLEM, was schon gelernt wurde – beliebig oft spielbar */
+  return shuffle([...usedIds()]).slice(0, 15);
+}
+/* Zähler "richtig in Folge": zählt nur EINMAL pro Tag pro Wort */
+function markAnswer(id, ok){
+  const t = todayStr();
+  const w = getW(id);
+  if(w.lc !== t){
+    if(ok){
+      w.s++;
+      if(w.s >= 3 && !w.m){
+        w.m = true;
+        setTimeout(()=>{ toast("🏆 Gemeistert: „"+VOCAB[id].f+"“ (3 Tage in Folge!)"); }, 600);
+        addXP(20);
+      }
+    } else {
+      w.s = 0; w.w = true; w.m = false;
+    }
+    w.lc = t;
+  }
+  const day = S.days[t];
+  if(day) day.res[id] = ok;
+  addXP(ok ? 10 : 0);
+  save();
+  checkBadges();
+}
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i];a[i]=a[j];a[j]=t; }
+  return a;
+}
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+/* =====================================================================
+   ABZEICHEN
+   ===================================================================== */
+const BADGES = [
+  { id:"first",   em:"🐪", t:"Erster Test",        chk:()=> S.lastTestDay !== null },
+  { id:"streak3", em:"🔥", t:"3-Tage-Streak",      chk:()=> S.streak >= 3 },
+  { id:"streak7", em:"🌋", t:"7-Tage-Streak",      chk:()=> S.streak >= 7 },
+  { id:"streak30",em:"☄️", t:"30-Tage-Streak",     chk:()=> S.streak >= 30 },
+  { id:"m10",     em:"🌱", t:"10 gemeistert",      chk:()=> masteredCount() >= 10 },
+  { id:"m50",     em:"🌸", t:"50 gemeistert",      chk:()=> masteredCount() >= 50 },
+  { id:"m100",    em:"🌳", t:"100 gemeistert",     chk:()=> masteredCount() >= 100 },
+  { id:"m250",    em:"🏔️", t:"250 gemeistert",     chk:()=> masteredCount() >= 250 },
+  { id:"xp500",   em:"⭐", t:"500 XP",             chk:()=> S.xp >= 500 },
+  { id:"xp2000",  em:"💫", t:"2000 XP",            chk:()=> S.xp >= 2000 },
+  { id:"games",   em:"🎮", t:"Alle Spiele gespielt",chk:()=> S.games.memory && S.games.blitz && S.games.scramble },
+  { id:"weekly",  em:"🗓️", t:"Weekly Challenge",    chk:()=> S.weeklyDone !== null },
+  { id:"cat1",    em:"🏅", t:"1 Kategorie komplett",chk:()=> CATS.some(c => catMastered(c) >= catTotal(c)) }
+];
+function masteredCount(){ return Object.values(S.words).filter(w=>w.m).length; }
+function catTotal(c){ return VOCAB.filter(v=>v.c===c).length; }
+function catMastered(c){
+  let n=0; VOCAB.forEach((v,i)=>{ if(v.c===c && S.words[i] && S.words[i].m) n++; });
+  return n;
+}
+function checkBadges(){
+  BADGES.forEach(b=>{
+    if(!S.badges.includes(b.id) && b.chk()){
+      S.badges.push(b.id); save();
+      setTimeout(()=>{ toast(b.em+" Abzeichen: "+b.t+"!"); confetti(60); sfx("fanfare"); }, 300);
+    }
+  });
+}
+
+/* =====================================================================
+   KOPFZEILE & ROUTER
+   ===================================================================== */
+function renderHeader(){
+  const li = levelInfo();
+  document.getElementById("hdr-streak").textContent = S.streak;
+  document.getElementById("hdr-level").textContent = li.l;
+  document.getElementById("hdr-xp").textContent = S.xp+" XP";
+  document.getElementById("hdr-xpnext").textContent = "noch "+(li.need-li.cur)+" XP bis Level "+(li.l+1);
+  document.getElementById("hdr-xpfill").style.width = Math.round(li.cur/li.need*100)+"%";
+}
+let TIMERS = [];
+function clearTimers(){ TIMERS.forEach(clearInterval); TIMERS = []; }
+const APP = () => document.getElementById("app");
+function go(view, arg){
+  clearTimers();
+  window.scrollTo(0,0);
+  if(view==="home") viewHome();
+  else if(view==="daily") viewDaily();
+  else if(view==="learn") viewLearn();
+  else if(view==="test") startTest("daily");
+  else if(view==="weekly") startTest("weekly");
+  else if(view==="cats") viewCats();
+  else if(view==="cat") viewCat(arg);
+  else if(view==="catPractice") startTest("cat", arg);
+  else if(view==="games") viewGames();
+  else if(view==="memory") viewMemory();
+  else if(view==="blitz") viewBlitz();
+  else if(view==="scramble") viewScramble();
+  else if(view==="progress") viewProgress();
+}
+
+/* =====================================================================
+   STARTBILDSCHIRM
+   ===================================================================== */
+function viewHome(){
+  const t = todayStr();
+  const day = S.days[t];
+  let dailyStatus = "15 neue Wörter warten";
+  if(day && day.tested) dailyStatus = "Heute erledigt ✔ – Spiele freigeschaltet!";
+  else if(day && day.learned) dailyStatus = "Gelernt ✔ – jetzt zum Test!";
+  else if(day) dailyStatus = "Angefangen – weiter lernen!";
+  const pool = repeatPool().length;
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>¡Hola! 👋</h2>
+    <p class="muted">Deine tägliche Vokabel-Fiesta durch die Spanisch-Welt.</p>
+    <div class="menu-grid">
+      <button class="menu-tile" onclick="go('daily')">
+        <div class="icon">📅</div>
+        <div><b>Daily Words</b><small>${dailyStatus}</small></div>
+      </button>
+      <button class="menu-tile" onclick="go('weekly')">
+        <div class="icon">🗓️</div>
+        <div><b>Weekly Challenge</b><small>15 zufällige gelernte Wörter (${usedIds().size} im Topf) – so oft du willst${S.weeklyDone===weekKey() ? " · Wochenbonus ✔" : ""}</small></div>
+      </button>
+      <button class="menu-tile" onclick="go('cats')">
+        <div class="icon">🗂️</div>
+        <div><b>Nach Kategorie lernen</b><small>${CATS.length} Kategorien · ${VOCAB.length} Wörter</small></div>
+      </button>
+      <button class="menu-tile" onclick="go('games')">
+        <div class="icon">🎮</div>
+        <div><b>Minispiele</b><small>Memory, Blitz-Quiz &amp; Wirrwarr</small></div>
+      </button>
+      <button class="menu-tile" onclick="go('progress')">
+        <div class="icon">🏆</div>
+        <div><b>Fortschritt &amp; Abzeichen</b><small>${masteredCount()} gemeistert · ${pool} im Wiederhol-Pool</small></div>
+      </button>
+    </div>
+  </div>`;
+}
+
+/* =====================================================================
+   DAILY WORDS – Übersicht
+   ===================================================================== */
+function viewDaily(){
+  const day = ensureToday();
+  if(day.ids.length === 0){
+    APP().innerHTML = `<div class="screen card center"><h2>🎓 Wow!</h2><p>Du hast alle ${VOCAB.length} Vokabeln der Datenbank durchgearbeitet. Ergänze neue Wörter in der Datei, um weiterzumachen!</p><button class="btn" onclick="go('home')">Zurück</button></div>`;
+    return;
+  }
+  const testCount = buildTestSet().length;
+  const pool = repeatPool().length;
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>📅 Daily Words</h2>
+    <div class="card">
+      <h3>1️⃣ Lernen ${day.learned ? "✔" : ""}</h3>
+      <p class="muted">Präg dir die ${day.ids.length} neuen Wörter von heute ein.</p>
+      <button class="btn turq" onclick="go('learn')"><span class="big-emoji">🧠</span> ${day.learned ? "Nochmal ansehen" : "Jetzt lernen"}</button>
+    </div>
+    <div class="card">
+      <h3>2️⃣ Test ${day.tested ? "✔" : ""}</h3>
+      <p class="muted">${testCount} Wörter: die letzten 3 Tage + dein Wiederhol-Pool (${pool} Wörter). Ein Wort gilt erst nach <b>3 Tagen in Folge richtig</b> als gemeistert.</p>
+      <button class="btn ${day.tested ? "ghost" : ""}" onclick="go('test')" ${day.learned ? "" : "disabled"}><span class="big-emoji">✏️</span> ${day.tested ? "Test wiederholen (zählt nicht doppelt)" : "Test starten"}</button>
+      ${day.learned ? "" : '<p class="muted center" style="margin:6px 0 0;font-size:.85rem">Erst lernen, dann testen 😉</p>'}
+    </div>
+    <div class="card">
+      <h3>3️⃣ Spielen</h3>
+      <p class="muted">Festige die heutigen Wörter + deinen Wiederhol-Pool spielerisch.</p>
+      <button class="btn saffron" onclick="go('games')"><span class="big-emoji">🎮</span> Zu den Spielen</button>
+    </div>
+  </div>`;
+}
+
+/* =====================================================================
+   LERN-MODUS (Karteikarten)
+   ===================================================================== */
+let FC = null;
+function viewLearn(){
+  const day = ensureToday();
+  FC = { ids: day.ids.slice(), i: 0, mode: "daily" };
+  renderFlash("Neue Wörter heute");
+}
+function renderFlash(title){
+  const id = FC.ids[FC.i];
+  const v = VOCAB[id];
+  const w = getW(id);
+  if(!w.seen){ w.seen = true; addXP(1); save(); }
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>🧠 ${esc(title)}</h2>
+    <div class="counter">Karte ${FC.i+1} von ${FC.ids.length}</div>
+    <div class="flash-wrap">
+      <div class="flash" id="flash" onclick="this.classList.toggle('flipped'); sfx('click')">
+        <div class="face">
+          <div class="tag">${esc(v.c)}</div>
+          <div class="word">${esc(v.d)}</div>
+          <div class="hint">Tippen zum Umdrehen 🔄</div>
+        </div>
+        <div class="face back">
+          <div class="tag">Spanisch</div>
+          <div class="word">${esc(v.f)}</div>
+          <div class="hint">${esc(v.d)}</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn ghost" onclick="flashMove(-1)" ${FC.i===0?"disabled":""}>◀ Zurück</button>
+      <button class="btn" onclick="flashMove(1)">${FC.i===FC.ids.length-1 ? "Fertig ✔" : "Weiter ▶"}</button>
+    </div>
+  </div>`;
+}
+function flashMove(dir){
+  FC.i += dir;
+  if(FC.i >= FC.ids.length){
+    if(FC.mode === "daily"){
+      const day = ensureToday();
+      if(!day.learned){ day.learned = true; save(); addXP(15); confetti(40); sfx("ok"); toast("+15 XP – alle Wörter angesehen!"); }
+      go("daily");
+    } else {
+      go("cat", FC.cat);
+    }
+    return;
+  }
+  if(FC.i < 0) FC.i = 0;
+  renderFlash(FC.mode==="daily" ? "Neue Wörter heute" : CATS[FC.cat]);
+}
+
+/* =====================================================================
+   TEST / SCHREIB-TRAINING (Tippen + Ähnlichkeitsprüfung)
+   ===================================================================== */
+let T = null;
+function startTest(mode, catIdx){
+  let list;
+  if(mode === "daily"){
+    ensureToday();
+    list = buildTestSet();
+  } else if(mode === "weekly"){
+    list = weeklySet();
+    if(!list.length){ toast("Noch keine Wörter gelernt – starte erst Daily Words!"); go("daily"); return; }
+  } else {
+    const c = CATS[catIdx];
+    const ids = []; VOCAB.forEach((v,i)=>{ if(v.c===c) ids.push(i); });
+    list = shuffle(ids).slice(0, 10);
+  }
+  if(!list.length){ toast("Keine Wörter zum Testen – erst lernen!"); go("daily"); return; }
+  T = { mode:mode, cat:catIdx, list:list, i:0, res:[], answered:false };
+  renderQuestion();
+}
+function renderQuestion(){
+  const id = T.list[T.i];
+  const v = VOCAB[id];
+  const dots = T.list.map((_,k)=>{
+    if(k === T.i) return '<span class="dot now"></span>';
+    if(k < T.i) return '<span class="dot '+(T.res[k]?"ok":"bad")+'"></span>';
+    return '<span class="dot"></span>';
+  }).join("");
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>✏️ ${T.mode==="daily" ? "Täglicher Test" : T.mode==="weekly" ? "🗓️ Weekly Challenge" : "Schreib-Training: "+esc(CATS[T.cat])}</h2>
+    <div class="progress-dots">${dots}</div>
+    <div class="card">
+      <div class="quiz-cat">${esc(v.c)}</div>
+      <div class="quiz-word">${esc(v.d)}</div>
+      <p class="muted center" style="margin:4px 0 12px">Wie heißt das auf Spanisch? (Akzente darfst du weglassen – á = a, ñ = n)</p>
+      <input type="text" id="answer" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+             placeholder="Deine Antwort…" onkeydown="if(event.key==='Enter')checkAnswer()">
+      <div id="fb"></div>
+      <div id="actions"><button class="btn" onclick="checkAnswer()">Prüfen ✔</button></div>
+    </div>
+    <div class="counter">Wort ${T.i+1} von ${T.list.length}</div>
+  </div>`;
+  const inp = document.getElementById("answer");
+  setTimeout(()=>{ try{ inp.focus(); }catch(e){} }, 100);
+}
+function checkAnswer(){
+  if(T.answered) return;
+  const inp = document.getElementById("answer");
+  const val = inp.value;
+  if(!norm(val)){ toast("Erst etwas eintippen 😉"); return; }
+  const id = T.list[T.i];
+  const v = VOCAB[id];
+  const result = evalAnswer(val, v.f);
+  const fb = document.getElementById("fb");
+  const actions = document.getElementById("actions");
+  inp.disabled = true;
+  if(result === "correct"){
+    T.answered = true;
+    fb.innerHTML = '<div class="feedback ok pop">✅ '+PRAISE[Math.floor(Math.random()*PRAISE.length)]+' „'+esc(v.f)+'“ (+10 XP)</div>';
+    actions.innerHTML = '<button class="btn turq" onclick="nextQuestion(true)">Weiter ▶</button>';
+    sfx("ok");
+  } else if(result === "similar"){
+    fb.innerHTML = `
+      <div class="feedback warn pop">🤔 Fast gleich – entscheide selbst!</div>
+      <div class="compare">
+        <div><small>Deine Eingabe</small><b>${esc(val)}</b></div>
+        <div><small>Lösung</small><b>${esc(v.f)}</b></div>
+      </div>`;
+    actions.innerHTML = `
+      <div class="btn-row">
+        <button class="btn turq" onclick="simDecide(true)">✔ Gilt als richtig</button>
+        <button class="btn pome" onclick="simDecide(false)">✘ War falsch</button>
+      </div>`;
+    sfx("click");
+  } else {
+    T.answered = true;
+    fb.innerHTML = '<div class="feedback bad pop">❌ '+CHEER_WRONG[Math.floor(Math.random()*CHEER_WRONG.length)]+'<br>Richtig ist: <b>„'+esc(v.f)+'“</b></div>';
+    actions.innerHTML = '<button class="btn" onclick="nextQuestion(false)">Weiter ▶</button>';
+    sfx("bad");
+  }
+}
+function simDecide(ok){
+  const id = T.list[T.i];
+  const v = VOCAB[id];
+  T.answered = true;
+  const fb = document.getElementById("fb");
+  const actions = document.getElementById("actions");
+  if(ok){
+    fb.innerHTML = '<div class="feedback ok pop">✅ Zählt als richtig: „'+esc(v.f)+'“ (+10 XP)</div>';
+    sfx("ok");
+  } else {
+    fb.innerHTML = '<div class="feedback bad pop">Ehrlich währt am längsten 💪 – „'+esc(v.f)+'“ kommt in den Wiederhol-Pool.</div>';
+    sfx("bad");
+  }
+  actions.innerHTML = '<button class="btn turq" onclick="nextQuestion('+(ok?"true":"false")+')">Weiter ▶</button>';
+}
+function nextQuestion(ok){
+  const id = T.list[T.i];
+  markAnswer(id, ok);
+  T.res.push(ok);
+  T.i++;
+  T.answered = false;
+  if(T.i >= T.list.length){ finishTest(); } else { renderQuestion(); }
+}
+function finishTest(){
+  const right = T.res.filter(Boolean).length;
+  const total = T.res.length;
+  const pct = Math.round(right/total*100);
+  let bonusMsg = "";
+  if(T.mode === "weekly"){
+    bonusMsg = '<p class="center muted">Falsche Wörter sind jetzt automatisch im Wiederhol-Pool und kommen im täglichen Test dran. 🔁</p>';
+    if(S.weeklyDone !== weekKey()){
+      S.weeklyDone = weekKey(); save();
+      addXP(75);
+      bonusMsg = '<p class="center" style="font-weight:800;color:var(--saffron)">+75 XP Wochenbonus! 🗓️</p>' + bonusMsg;
+      checkBadges();
+    }
+    bonusMsg += '<button class="btn pome" onclick="go(&quot;weekly&quot;)"><span class="big-emoji">🗓️</span> Gleich nochmal (neue 15 Wörter)</button>';
+  }
+  if(T.mode === "daily"){
+    const day = ensureToday();
+    if(!day.tested){
+      day.tested = true; save();
+      addXP(30);
+      updateDayStreak();
+      bonusMsg = '<p class="center" style="font-weight:800;color:var(--saffron)">+30 XP Tagesbonus · 🔥 Streak: '+S.streak+'</p>';
+      checkBadges();
+    }
+  }
+  if(pct >= 60){ confetti(pct); sfx("fanfare"); }
+  const face = pct>=90 ? "🥳" : pct>=60 ? "😃" : "💪";
+  APP().innerHTML = `
+  <div class="screen card center">
+    <div class="star8 pop" style="width:90px;height:90px;font-size:1.6rem;margin:10px auto">${pct}%</div>
+    <h2>${face} ${right} von ${total} richtig!</h2>
+    ${bonusMsg}
+    <p class="muted">Falsche Wörter bleiben im Wiederhol-Pool, bis sie an 3 Tagen in Folge richtig waren.</p>
+    <button class="btn saffron" onclick="go('games')"><span class="big-emoji">🎮</span> Mit Spielen festigen</button>
+    <button class="btn ghost" onclick="go('home')">Zum Start</button>
+  </div>`;
+}
+
+/* =====================================================================
+   KATEGORIEN
+   ===================================================================== */
+function viewCats(){
+  const tiles = CATS.map((c,i)=>{
+    const tot = catTotal(c), m = catMastered(c);
+    const pct = tot ? Math.round(m/tot*100) : 0;
+    return `<button class="cat-tile" onclick="go('cat',${i})">
+      <span class="em">${CAT_ICONS[c]||"📁"}</span>
+      <b>${esc(c)}</b>
+      <div class="mini-bar"><div style="width:${pct}%"></div></div>
+      <small>${m}/${tot} gemeistert</small>
+    </button>`;
+  }).join("");
+  APP().innerHTML = `<div class="screen"><h2>🗂️ Kategorien</h2><div class="cat-grid">${tiles}</div></div>`;
+}
+function viewCat(i){
+  const c = CATS[i];
+  const ids = []; VOCAB.forEach((v,k)=>{ if(v.c===c) ids.push(k); });
+  const list = ids.map(id=>{
+    const w = S.words[id];
+    const badge = w && w.m ? " 🏆" : (w && w.w ? " 🔁" : "");
+    return `<div style="display:flex;justify-content:space-between;gap:10px;padding:9px 4px;border-bottom:1px solid #E1EBEA">
+      <span>${esc(VOCAB[id].d)}</span><b style="color:var(--lapis)">${esc(VOCAB[id].f)}${badge}</b>
+    </div>`;
+  }).join("");
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>${CAT_ICONS[c]||""} ${esc(c)}</h2>
+    <div class="btn-row">
+      <button class="btn turq" onclick="catFlash(${i})"><span class="big-emoji">🧠</span> Karteikarten</button>
+      <button class="btn" onclick="go('catPractice',${i})"><span class="big-emoji">✏️</span> Schreib-Training (10)</button>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <p class="muted" style="margin-top:0">🏆 = gemeistert · 🔁 = im Wiederhol-Pool</p>
+      ${list}
+    </div>
+    <button class="btn ghost" onclick="go('cats')">◀ Alle Kategorien</button>
+  </div>`;
+}
+function catFlash(i){
+  const c = CATS[i];
+  const ids = []; VOCAB.forEach((v,k)=>{ if(v.c===c) ids.push(k); });
+  FC = { ids: shuffle(ids), i: 0, mode: "cat", cat: i };
+  renderFlash(c);
+}
+
+/* =====================================================================
+   SPIELE
+   ===================================================================== */
+function gameWords(){
+  /* Nur: heutige Daily-Wörter + Wiederhol-Pool (falsch beantwortete Wörter) */
+  const t = todayStr();
+  const set = new Set();
+  if(S.days[t]) S.days[t].ids.forEach(id => set.add(id));
+  repeatPool().forEach(id => set.add(id));
+  return [...set];
+}
+function viewGames(){
+  if(gameWords().length === 0){
+    APP().innerHTML = `<div class="screen card center"><h2>🎮 Minispiele</h2>
+      <p class="muted">Noch keine Wörter zum Spielen. Starte zuerst deine Daily Words – gespielt wird mit den heutigen Wörtern und deinem Wiederhol-Pool.</p>
+      <button class="btn" onclick="go('daily')">📅 Zu den Daily Words</button></div>`;
+    return;
+  }
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>🎮 Minispiele</h2>
+    <p class="muted">Gespielt wird mit den heutigen Daily-Wörtern + deinem Wiederhol-Pool (${gameWords().length} Wörter).</p>
+    <div class="menu-grid">
+      <button class="menu-tile" onclick="go('memory')">
+        <div class="icon">🃏</div><div><b>Memory</b><small>Deutsch ↔ Spanisch Paare finden</small></div>
+      </button>
+      <button class="menu-tile" onclick="go('blitz')">
+        <div class="icon">⚡</div><div><b>Blitz-Quiz</b><small>60 Sekunden gegen die Uhr</small></div>
+      </button>
+      <button class="menu-tile" onclick="go('scramble')">
+        <div class="icon">🔤</div><div><b>Buchstaben-Wirrwarr</b><small>Wörter zusammensetzen</small></div>
+      </button>
+    </div>
+  </div>`;
+}
+
+/* ---------- Memory ---------- */
+let MEM = null;
+function viewMemory(){
+  S.games.memory = true; save(); checkBadges();
+  const ids = shuffle(gameWords()).slice(0, 8);
+  const cards = [];
+  ids.forEach(id=>{ cards.push({id:id, side:"d"}); cards.push({id:id, side:"f"}); });
+  MEM = { cards: shuffle(cards), open: [], done: 0, total: ids.length, lock: false };
+  renderMemory();
+}
+function renderMemory(){
+  const grid = MEM.cards.map((c,i)=>{
+    const isOpen = MEM.open.includes(i) || c.matched;
+    const cls = c.matched ? "mem-card done" : (isOpen ? "mem-card open" : "mem-card");
+    const label = isOpen ? esc(c.side==="d" ? VOCAB[c.id].d : VOCAB[c.id].f) : "✳";
+    return `<button class="${cls}" onclick="memClick(${i})">${label}</button>`;
+  }).join("");
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>🃏 Memory</h2>
+    <p class="muted">Finde die Paare: deutsches Wort + spanisches Wort. Gefunden: ${MEM.done}/${MEM.total}</p>
+    <div class="memory-grid">${grid}</div>
+    <div class="spacer"></div>
+    <button class="btn ghost" onclick="go('games')">◀ Spieleauswahl</button>
+  </div>`;
+}
+function memClick(i){
+  if(MEM.lock) return;
+  const c = MEM.cards[i];
+  if(c.matched || MEM.open.includes(i)) return;
+  sfx("click");
+  MEM.open.push(i);
+  renderMemory();
+  if(MEM.open.length === 2){
+    MEM.lock = true;
+    const a = MEM.cards[MEM.open[0]], b = MEM.cards[MEM.open[1]];
+    if(a.id === b.id){
+      setTimeout(()=>{
+        a.matched = true; b.matched = true;
+        MEM.open = []; MEM.lock = false; MEM.done++;
+        addXP(5); sfx("ok");
+        renderMemory();
+        if(MEM.done === MEM.total){
+          addXP(20); confetti(70); sfx("fanfare");
+          setTimeout(()=>toast("🃏 Memory geschafft! +20 XP Bonus"), 200);
+        }
+      }, 450);
+    } else {
+      setTimeout(()=>{ MEM.open = []; MEM.lock = false; sfx("bad"); renderMemory(); }, 900);
+    }
+  }
+}
+
+/* ---------- Blitz-Quiz ---------- */
+let BZ = null;
+function viewBlitz(){
+  S.games.blitz = true; save(); checkBadges();
+  BZ = { pool: shuffle(gameWords()), i: 0, score: 0, time: 60, lock: false };
+  const iv = setInterval(()=>{
+    BZ.time--;
+    const bar = document.getElementById("bz-bar");
+    const lbl = document.getElementById("bz-time");
+    if(bar) bar.style.width = (BZ.time/60*100)+"%";
+    if(lbl) lbl.textContent = BZ.time+" s";
+    if(BZ.time <= 0){ clearTimers(); blitzEnd(); }
+  }, 1000);
+  TIMERS.push(iv);
+  renderBlitz();
+}
+function renderBlitz(){
+  if(BZ.i >= BZ.pool.length){ BZ.pool = shuffle(BZ.pool); BZ.i = 0; }
+  const id = BZ.pool[BZ.i];
+  const v = VOCAB[id];
+  const opts = [v.f];
+  while(opts.length < 4){
+    const r = VOCAB[Math.floor(Math.random()*VOCAB.length)].f;
+    if(!opts.includes(r)) opts.push(r);
+  }
+  shuffle(opts);
+  BZ.correct = v.f;
+  const btns = opts.map(o=>`<button class="choice" onclick="blitzPick(this,'${esc(o).replace(/'/g,"\\'")}')">${esc(o)}</button>`).join("");
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>⚡ Blitz-Quiz <span style="float:right;font-size:1rem" id="bz-time">${BZ.time} s</span></h2>
+    <div class="timer-bar"><div id="bz-bar" style="width:${BZ.time/60*100}%"></div></div>
+    <div class="card">
+      <div class="quiz-cat">${esc(v.c)}</div>
+      <div class="quiz-word">${esc(v.d)}</div>
+      <div class="spacer"></div>
+      <div class="choice-grid">${btns}</div>
+    </div>
+    <div class="counter">Richtig: ${BZ.score} ✔</div>
+  </div>`;
+}
+function blitzPick(el, val){
+  if(BZ.lock) return;
+  BZ.lock = true;
+  const ok = (val === BZ.correct);
+  el.classList.add(ok ? "ok" : "bad");
+  if(ok){ BZ.score++; addXP(5); sfx("ok"); }
+  else {
+    sfx("bad");
+    document.querySelectorAll(".choice").forEach(b=>{ if(b.textContent === BZ.correct) b.classList.add("ok"); });
+  }
+  setTimeout(()=>{ BZ.i++; BZ.lock = false; if(BZ.time > 0) renderBlitz(); }, ok ? 350 : 900);
+}
+function blitzEnd(){
+  confetti(Math.min(BZ.score*8, 90)); sfx("fanfare");
+  APP().innerHTML = `
+  <div class="screen card center">
+    <h2>⏱️ Zeit um!</h2>
+    <div class="star8 pop" style="width:90px;height:90px;margin:10px auto">${BZ.score}</div>
+    <p style="font-weight:800">${BZ.score} richtige Antworten – ${BZ.score*5} XP!</p>
+    <button class="btn saffron" onclick="go('blitz')">Nochmal ⚡</button>
+    <button class="btn ghost" onclick="go('games')">◀ Spieleauswahl</button>
+  </div>`;
+}
+
+/* ---------- Buchstaben-Wirrwarr ---------- */
+let SCR = null;
+function viewScramble(){
+  S.games.scramble = true; save(); checkBadges();
+  let ids = gameWords().filter(id => VOCAB[id].f.length <= 12);
+  if(!ids.length) ids = gameWords();
+  SCR = { ids: shuffle(ids).slice(0, 8), i: 0, solved: 0 };
+  scrambleRound();
+}
+function scrambleRound(){
+  if(SCR.i >= SCR.ids.length){ scrambleEnd(); return; }
+  const id = SCR.ids[SCR.i];
+  const target = VOCAB[id].f.replace(/\s+/g,"");
+  SCR.target = target;
+  SCR.letters = shuffle(target.split(""));
+  SCR.filled = [];
+  renderScramble();
+}
+function renderScramble(){
+  const id = SCR.ids[SCR.i];
+  const v = VOCAB[id];
+  const slots = SCR.target.split("").map((_,k)=>{
+    const ch = SCR.filled[k] !== undefined ? SCR.letters[SCR.filled[k]] : "";
+    return `<div class="slot ${ch?"filled":""}">${esc(ch)}</div>`;
+  }).join("");
+  const letters = SCR.letters.map((ch,k)=>{
+    const used = SCR.filled.includes(k);
+    return `<button class="letter ${used?"used":""}" onclick="scrPick(${k})">${esc(ch)}</button>`;
+  }).join("");
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>🔤 Buchstaben-Wirrwarr</h2>
+    <div class="counter">Wort ${SCR.i+1} von ${SCR.ids.length} · gelöst: ${SCR.solved}</div>
+    <div class="card center">
+      <div class="quiz-cat">${esc(v.c)}</div>
+      <div class="quiz-word">${esc(v.d)}</div>
+      <div class="answer-slots">${slots}</div>
+      <div class="letters">${letters}</div>
+      <div id="scr-fb"></div>
+      <div class="btn-row">
+        <button class="btn ghost small" onclick="scrUndo()">⌫ Zurück</button>
+        <button class="btn ghost small" onclick="scrSkip()">Überspringen ▶</button>
+      </div>
+    </div>
+    <button class="btn ghost" onclick="go('games')">◀ Spieleauswahl</button>
+  </div>`;
+}
+function scrPick(k){
+  if(SCR.filled.includes(k) || SCR.filled.length >= SCR.target.length) return;
+  sfx("click");
+  SCR.filled.push(k);
+  renderScramble();
+  if(SCR.filled.length === SCR.target.length){
+    const word = SCR.filled.map(x=>SCR.letters[x]).join("");
+    const fb = document.getElementById("scr-fb");
+    if(word === SCR.target){
+      SCR.solved++; addXP(8); sfx("ok"); confetti(20);
+      fb.innerHTML = '<div class="feedback ok pop">✅ Richtig! „'+esc(VOCAB[SCR.ids[SCR.i]].f)+'“ (+8 XP)</div>';
+      setTimeout(()=>{ SCR.i++; scrambleRound(); }, 900);
+    } else {
+      sfx("bad");
+      fb.innerHTML = '<div class="feedback bad pop">Noch nicht – sortiere um! ⌫</div>';
+    }
+  }
+}
+function scrUndo(){ SCR.filled.pop(); renderScramble(); }
+function scrSkip(){ SCR.i++; scrambleRound(); }
+function scrambleEnd(){
+  confetti(60); sfx("fanfare");
+  APP().innerHTML = `
+  <div class="screen card center">
+    <h2>🔤 Fertig!</h2>
+    <div class="star8 pop" style="width:90px;height:90px;margin:10px auto">${SCR.solved}/${SCR.ids.length}</div>
+    <p style="font-weight:800">${SCR.solved} Wörter zusammengesetzt!</p>
+    <button class="btn saffron" onclick="go('scramble')">Nochmal 🔤</button>
+    <button class="btn ghost" onclick="go('games')">◀ Spieleauswahl</button>
+  </div>`;
+}
+
+/* =====================================================================
+   FORTSCHRITT & ABZEICHEN
+   ===================================================================== */
+function viewProgress(){
+  const li = levelInfo();
+  const pool = repeatPool().length;
+  const badges = BADGES.map(b=>{
+    const has = S.badges.includes(b.id);
+    return `<div class="badge ${has?"":"locked"}"><div class="em">${b.em}</div><small>${esc(b.t)}</small></div>`;
+  }).join("");
+  const catBars = CATS.map(c=>{
+    const tot = catTotal(c), m = catMastered(c);
+    const pct = tot ? Math.round(m/tot*100) : 0;
+    return `<div class="cat-progress">
+      <div class="row"><span>${CAT_ICONS[c]||""} ${esc(c)}</span><span>${m}/${tot}</span></div>
+      <div class="mini-bar"><div style="width:${pct}%"></div></div>
+    </div>`;
+  }).join("");
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>🏆 Dein Fortschritt</h2>
+    <div class="stat-grid">
+      <div class="stat"><b>🔥 ${S.streak}</b><small>Tage-Streak</small></div>
+      <div class="stat"><b>⭐ ${li.l}</b><small>Level (${S.xp} XP)</small></div>
+      <div class="stat"><b>🏆 ${masteredCount()}</b><small>Wörter gemeistert</small></div>
+      <div class="stat"><b>🔁 ${pool}</b><small>im Wiederhol-Pool</small></div>
+    </div>
+    <div class="card"><h3>Abzeichen</h3><div class="badge-grid">${badges}</div></div>
+    <div class="card"><h3>Kategorien</h3>${catBars}</div>
+  </div>`;
+}
+
+/* =====================================================================
+   START
+   ===================================================================== */
+document.getElementById("sound-toggle").textContent = S.sound ? "🔊" : "🔇";
+renderHeader();
+checkBadges();
+go("home");
+</script>
+</body>
+</html>
