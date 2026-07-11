@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Farsi Karawane – Vokabeltrainer</title>
+<style>
+:root{
+  --bg:#CEDDDB;
+  --card:#F7FBFA;
+  --ink:#16283A;
+  --ink-soft:#4E6779;
+  --lapis:#2B5FC7;
+  --lapis-deep:#1E4494;
+  --turq:#12968E;
+  --turq-soft:#D6EEEB;
+  --saffron:#F2A81D;
+  --pome:#C33C54;
+  --ok:#1F9D55;
+  --ok-soft:#DFF2E6;
+  --bad:#C0392B;
+  --bad-soft:#FBE7E4;
+  --warn-soft:#FCF2DB;
+  --radius:20px;
+  --shadow:0 4px 14px rgba(22,40,58,.14);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:ui-rounded,"SF Pro Rounded","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+  min-height:100vh;
+}
+/* ---------- Kopfzeile mit Kachelmuster ---------- */
+header{
+  background:var(--lapis);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%233F74D6' stroke-width='2'%3E%3Cpath d='M28 4 L34 22 L52 28 L34 34 L28 52 L22 34 L4 28 L22 22 Z'/%3E%3C/g%3E%3C/svg%3E");
+  color:#fff;
+  padding:14px 16px 12px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 10px rgba(30,68,148,.35);
+}
+.head-row{display:flex;align-items:center;gap:10px;max-width:980px;margin:0 auto}
+.head-row h1{font-size:1.15rem;margin:0;flex:1;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{
+  background:rgba(255,255,255,.16);
+  border:1.5px solid rgba(255,255,255,.35);
+  border-radius:999px;padding:6px 12px;font-weight:700;font-size:.95rem;
+  display:flex;align-items:center;gap:5px;white-space:nowrap;
+}
+.pill.streak{background:rgba(242,168,29,.25);border-color:var(--saffron)}
+#btn-home{background:rgba(255,255,255,.16);border:1.5px solid rgba(255,255,255,.35);color:#fff;border-radius:14px;font-size:1.3rem;padding:6px 12px;cursor:pointer;line-height:1}
+.xpbar{max-width:980px;margin:10px auto 0;background:rgba(255,255,255,.22);border-radius:99px;height:10px;overflow:hidden}
+.xpbar>div{height:100%;background:var(--saffron);border-radius:99px;transition:width .5s ease}
+.xp-label{max-width:980px;margin:4px auto 0;font-size:.75rem;opacity:.9;display:flex;justify-content:space-between}
+
+/* ---------- Grundlayout ---------- */
+main{max-width:980px;margin:0 auto;padding:18px 14px 90px}
+.screen{animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+h2{font-size:1.5rem;margin:.3em 0 .5em}
+h3{font-size:1.15rem;margin:.4em 0}
+.muted{color:var(--ink-soft)}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:14px}
+
+/* ---------- Buttons ---------- */
+button{font-family:inherit}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;min-height:60px;padding:14px 18px;margin:8px 0;
+  border:none;border-radius:18px;cursor:pointer;
+  font-size:1.15rem;font-weight:800;color:#fff;background:var(--lapis);
+  box-shadow:0 4px 0 var(--lapis-deep);
+  transition:transform .08s ease;
+}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--lapis-deep)}
+.btn.turq{background:var(--turq);box-shadow:0 4px 0 #0D7B74}
+.btn.turq:active{box-shadow:0 1px 0 #0D7B74}
+.btn.saffron{background:var(--saffron);box-shadow:0 4px 0 #C4830C;color:#4A3403}
+.btn.saffron:active{box-shadow:0 1px 0 #C4830C}
+.btn.pome{background:var(--pome);box-shadow:0 4px 0 #93293E}
+.btn.pome:active{box-shadow:0 1px 0 #93293E}
+.btn.ghost{background:#fff;color:var(--lapis);border:2px solid var(--lapis);box-shadow:none;font-weight:700}
+.btn.small{min-height:48px;font-size:1rem;width:auto;padding:10px 18px;display:inline-flex}
+.btn:disabled{opacity:.45;cursor:default}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+.btn-row .btn{flex:1;min-width:140px}
+.big-emoji{font-size:1.5rem}
+
+/* ---------- Startmenü ---------- */
+.menu-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:640px){.menu-grid{grid-template-columns:1fr 1fr}}
+.menu-tile{
+  background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:20px;cursor:pointer;border:none;text-align:left;
+  display:flex;gap:14px;align-items:center;min-height:96px;
+  transition:transform .1s ease;
+}
+.menu-tile:active{transform:scale(.97)}
+.menu-tile .icon{
+  font-size:2rem;width:64px;height:64px;flex:none;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:18px;background:var(--turq-soft);
+}
+.menu-tile b{font-size:1.15rem;display:block}
+.menu-tile small{color:var(--ink-soft);font-size:.9rem}
+
+/* ---------- Kategorien ---------- */
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(min-width:700px){.cat-grid{grid-template-columns:1fr 1fr 1fr}}
+.cat-tile{
+  background:var(--card);border:none;border-radius:16px;box-shadow:var(--shadow);
+  padding:14px;text-align:left;cursor:pointer;min-height:92px;
+}
+.cat-tile:active{transform:scale(.97)}
+.cat-tile .em{font-size:1.5rem}
+.cat-tile b{display:block;margin:4px 0 6px;font-size:1rem}
+.mini-bar{background:#C0D3D1;height:8px;border-radius:99px;overflow:hidden}
+.mini-bar>div{height:100%;background:var(--turq);border-radius:99px}
+.cat-tile small{color:var(--ink-soft);font-size:.75rem}
+
+/* ---------- Lernkarten ---------- */
+.flash-wrap{perspective:1200px;margin:14px 0}
+.flash{
+  position:relative;width:100%;min-height:230px;cursor:pointer;
+  transform-style:preserve-3d;transition:transform .5s;
+}
+.flash.flipped{transform:rotateY(180deg)}
+.flash .face{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  background:var(--card);border-radius:24px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;text-align:center;
+}
+.flash .face.back{transform:rotateY(180deg);background:var(--turq-soft)}
+.flash .word{font-size:2.2rem;font-weight:900;letter-spacing:.5px}
+.flash .tag{font-size:.8rem;font-weight:700;color:var(--turq);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.flash .hint{color:var(--ink-soft);font-size:.85rem;margin-top:14px}
+.counter{color:var(--ink-soft);font-weight:700;text-align:center;margin:6px 0}
+
+/* ---------- Test ---------- */
+.quiz-word{font-size:2rem;font-weight:900;text-align:center;margin:10px 0 4px}
+.quiz-cat{text-align:center;color:var(--turq);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:1px}
+input[type=text]{
+  width:100%;min-height:60px;font-size:1.4rem;text-align:center;
+  border:2.5px solid #B7CCCA;border-radius:16px;padding:10px 14px;
+  font-family:inherit;background:#fff;color:var(--ink);
+}
+input[type=text]:focus{outline:none;border-color:var(--lapis)}
+.feedback{border-radius:16px;padding:14px;margin:12px 0;font-weight:700;text-align:center;font-size:1.1rem}
+.feedback.ok{background:var(--ok-soft);color:var(--ok)}
+.feedback.bad{background:var(--bad-soft);color:var(--bad)}
+.feedback.warn{background:var(--warn-soft);color:#8A6207}
+.compare{display:flex;gap:10px;margin:10px 0}
+.compare>div{flex:1;background:#fff;border-radius:14px;padding:10px;text-align:center;border:2px solid #DCE8E7}
+.compare b{font-size:1.3rem;display:block}
+.compare small{color:var(--ink-soft)}
+.progress-dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+.dot{width:12px;height:12px;border-radius:50%;background:#AFC5C3}
+.dot.ok{background:var(--ok)}.dot.bad{background:var(--pome)}.dot.now{background:var(--saffron)}
+
+/* ---------- Spiele ---------- */
+.memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mem-card{
+  min-height:76px;border:none;border-radius:14px;cursor:pointer;
+  font-weight:800;font-size:.95rem;padding:6px;
+  background:var(--lapis);color:var(--lapis);box-shadow:0 3px 0 var(--lapis-deep);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M14 2 L17 11 L26 14 L17 17 L14 26 L11 17 L2 14 L11 11 Z' fill='%233F74D6'/%3E%3C/svg%3E");
+}
+.mem-card.open{background:var(--card);background-image:none;color:var(--ink);box-shadow:var(--shadow)}
+.mem-card.done{background:var(--ok-soft);background-image:none;color:var(--ok);box-shadow:none}
+.choice-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:560px){.choice-grid{grid-template-columns:1fr 1fr}}
+.choice{
+  min-height:64px;border:none;border-radius:16px;background:var(--card);
+  box-shadow:var(--shadow);font-size:1.2rem;font-weight:800;cursor:pointer;color:var(--ink);
+}
+.choice.ok{background:var(--ok-soft);color:var(--ok)}
+.choice.bad{background:var(--bad-soft);color:var(--bad)}
+.timer-bar{background:#C0D3D1;height:14px;border-radius:99px;overflow:hidden;margin:10px 0}
+.timer-bar>div{height:100%;background:var(--pome);border-radius:99px;transition:width 1s linear}
+.letters,.answer-slots{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
+.letter{
+  min-width:52px;min-height:56px;font-size:1.4rem;font-weight:900;
+  border:none;border-radius:12px;background:var(--card);box-shadow:var(--shadow);
+  cursor:pointer;color:var(--ink);
+}
+.letter.used{opacity:.25;pointer-events:none}
+.slot{
+  min-width:44px;min-height:52px;border-radius:10px;background:var(--turq-soft);
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;
+  border:2px dashed #8FC5C0;
+}
+.slot.filled{border-style:solid;background:#fff}
+
+/* ---------- Fortschritt & Abzeichen ---------- */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:14px;text-align:center}
+.stat b{font-size:1.7rem;display:block}
+.stat small{color:var(--ink-soft)}
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.badge{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:12px 6px;text-align:center}
+.badge .em{font-size:1.9rem}
+.badge small{display:block;font-size:.72rem;font-weight:700;margin-top:4px}
+.badge.locked{opacity:.35;filter:grayscale(1)}
+.cat-progress{margin:8px 0}
+.cat-progress .row{display:flex;justify-content:space-between;font-size:.85rem;font-weight:700;margin-bottom:3px}
+
+/* ---------- Toast, Konfetti, Sonstiges ---------- */
+#toast{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);
+  background:var(--ink);color:#fff;padding:12px 22px;border-radius:99px;
+  font-weight:800;z-index:100;transition:transform .3s ease;max-width:90vw;text-align:center;
+}
+#toast.show{transform:translateX(-50%) translateY(0)}
+.confetti{position:fixed;top:-12px;width:10px;height:14px;z-index:99;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.8}}
+@keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+.pop{animation:pop .35s ease}
+.star8{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:64px;height:64px;background:var(--saffron);color:#4A3403;font-weight:900;font-size:1.3rem;
+  clip-path:polygon(50% 0%,61% 24%,85% 15%,76% 39%,100% 50%,76% 61%,85% 85%,61% 76%,50% 100%,39% 76%,15% 85%,24% 61%,0% 50%,24% 39%,15% 15%,39% 24%);
+}
+.center{text-align:center}
+.spacer{height:8px}
+.sound-toggle{position:fixed;right:14px;bottom:14px;z-index:60;width:52px;height:52px;border-radius:50%;border:none;background:var(--card);box-shadow:var(--shadow);font-size:1.3rem;cursor:pointer}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="head-row">
+    <button id="btn-home" onclick="go('home')" aria-label="Startseite">🏠</button>
+    <h1>Farsi Karawane 🐪 <span style="font-size:.7rem;opacity:.7;font-weight:400">v5</span></h1>
+    <div class="pill streak">🔥 <span id="hdr-streak">0</span></div>
+    <div class="pill">⭐ Lv. <span id="hdr-level">1</span></div>
+  </div>
+  <div class="xpbar"><div id="hdr-xpfill" style="width:0%"></div></div>
+  <div class="xp-label"><span id="hdr-xp">0 XP</span><span id="hdr-xpnext"></span></div>
+</header>
+<main id="app"></main>
+<button class="sound-toggle" id="sound-toggle" onclick="toggleSound()" aria-label="Ton an/aus">🔊</button>
+<div id="toast"></div>
+<script>
+"use strict";
+/* =====================================================================
+   VOKABEL-DATENBANK
+   ---------------------------------------------------------------------
+   Struktur: { d: "deutsches Wort", f: "Farsi-Transliteration", c: "Kategorie" }
+   Aktuell enthalten: ca. 600 Vokabeln.
+   >>> WEITERE VOKABELN ERGÄNZEN: einfach unten in der jeweiligen
+   >>> Kategorie neue Zeilen im gleichen Format hinzufügen – der Rest
+   >>> der App passt sich automatisch an (Ziel: 1000+).
+   ===================================================================== */
+const VOCAB = [
+/* --- Zahlen --- */
+{d:"null",f:"sefr",c:"Zahlen"},{d:"eins",f:"yek",c:"Zahlen"},{d:"zwei",f:"do",c:"Zahlen"},{d:"drei",f:"se",c:"Zahlen"},
+{d:"vier",f:"chahâr",c:"Zahlen"},{d:"fünf",f:"panj",c:"Zahlen"},{d:"sechs",f:"shesh",c:"Zahlen"},{d:"sieben",f:"haft",c:"Zahlen"},
+{d:"acht",f:"hasht",c:"Zahlen"},{d:"neun",f:"noh",c:"Zahlen"},{d:"zehn",f:"dah",c:"Zahlen"},{d:"elf",f:"yâzdah",c:"Zahlen"},
+{d:"zwölf",f:"davâzdah",c:"Zahlen"},{d:"dreizehn",f:"sizdah",c:"Zahlen"},{d:"vierzehn",f:"chahârdah",c:"Zahlen"},{d:"fünfzehn",f:"pânzdah",c:"Zahlen"},
+{d:"sechzehn",f:"shânzdah",c:"Zahlen"},{d:"siebzehn",f:"hefdah",c:"Zahlen"},{d:"achtzehn",f:"hejdah",c:"Zahlen"},{d:"neunzehn",f:"nuzdah",c:"Zahlen"},
+{d:"zwanzig",f:"bist",c:"Zahlen"},{d:"dreißig",f:"si",c:"Zahlen"},{d:"vierzig",f:"chehel",c:"Zahlen"},{d:"fünfzig",f:"panjâh",c:"Zahlen"},
+{d:"sechzig",f:"shast",c:"Zahlen"},{d:"siebzig",f:"haftâd",c:"Zahlen"},{d:"achtzig",f:"hashtâd",c:"Zahlen"},{d:"neunzig",f:"navad",c:"Zahlen"},
+{d:"hundert",f:"sad",c:"Zahlen"},{d:"tausend",f:"hezâr",c:"Zahlen"},{d:"Million",f:"milyun",c:"Zahlen"},{d:"erste/r",f:"avval",c:"Zahlen"},
+{d:"letzte/r",f:"âkhar",c:"Zahlen"},{d:"halb",f:"nesf",c:"Zahlen"},{d:"Zahl",f:"adad",c:"Zahlen"},
+/* --- Farben --- */
+{d:"Farbe",f:"rang",c:"Farben"},{d:"rot",f:"ghermez",c:"Farben"},{d:"blau",f:"âbi",c:"Farben"},{d:"grün",f:"sabz",c:"Farben"},
+{d:"gelb",f:"zard",c:"Farben"},{d:"schwarz",f:"siyâh",c:"Farben"},{d:"weiß",f:"sefid",c:"Farben"},{d:"orange (Farbe)",f:"nârenji",c:"Farben"},
+{d:"rosa",f:"surati",c:"Farben"},{d:"lila",f:"banafsh",c:"Farben"},{d:"braun",f:"ghahvei",c:"Farben"},{d:"grau",f:"khâkestari",c:"Farben"},
+{d:"golden",f:"talâyi",c:"Farben"},{d:"silbern",f:"noghrei",c:"Farben"},
+/* --- Familie --- */
+{d:"Familie",f:"khânevâde",c:"Familie"},{d:"Mutter",f:"mâdar",c:"Familie"},{d:"Vater",f:"pedar",c:"Familie"},{d:"Eltern",f:"vâledeyn",c:"Familie"},
+{d:"Bruder",f:"barâdar",c:"Familie"},{d:"Schwester",f:"khâhar",c:"Familie"},{d:"Sohn",f:"pesar",c:"Familie"},{d:"Tochter",f:"dokhtar",c:"Familie"},
+{d:"Kind",f:"bachche",c:"Familie"},{d:"Baby",f:"nozâd",c:"Familie"},{d:"Großmutter",f:"mâdarbozorg",c:"Familie"},{d:"Großvater",f:"pedarbozorg",c:"Familie"},
+{d:"Onkel (väterlicherseits)",f:"amu",c:"Familie"},{d:"Onkel (mütterlicherseits)",f:"dâyi",c:"Familie"},{d:"Tante (väterlicherseits)",f:"amme",c:"Familie"},{d:"Tante (mütterlicherseits)",f:"khâle",c:"Familie"},
+{d:"Ehemann",f:"shohar",c:"Familie"},{d:"Ehepartner/in",f:"hamsar",c:"Familie"},{d:"Frau",f:"zan",c:"Familie"},{d:"Mann",f:"mard",c:"Familie"},
+{d:"Enkelkind",f:"nave",c:"Familie"},{d:"Verwandte",f:"fâmil",c:"Familie"},{d:"Zwillinge",f:"doghlu",c:"Familie"},{d:"Mädchen",f:"dokhtar bachche",c:"Familie"},
+/* --- Begrüßung & Höflichkeit --- */
+{d:"hallo",f:"salâm",c:"Begrüßung & Höflichkeit"},{d:"guten Morgen",f:"sobh bekheyr",c:"Begrüßung & Höflichkeit"},{d:"guten Abend",f:"asr bekheyr",c:"Begrüßung & Höflichkeit"},{d:"gute Nacht",f:"shab bekheyr",c:"Begrüßung & Höflichkeit"},
+{d:"auf Wiedersehen",f:"khodâhâfez",c:"Begrüßung & Höflichkeit"},{d:"bis später",f:"tâ badan",c:"Begrüßung & Höflichkeit"},{d:"danke",f:"mersi",c:"Begrüßung & Höflichkeit"},{d:"vielen Dank",f:"kheyli mamnun",c:"Begrüßung & Höflichkeit"},
+{d:"bitte (Bitte um etwas)",f:"lotfan",c:"Begrüßung & Höflichkeit"},{d:"gern geschehen",f:"khâhesh mikonam",c:"Begrüßung & Höflichkeit"},{d:"ja",f:"bale",c:"Begrüßung & Höflichkeit"},{d:"nein",f:"na",c:"Begrüßung & Höflichkeit"},
+{d:"Entschuldigung",f:"bebakhshid",c:"Begrüßung & Höflichkeit"},{d:"Wie geht es dir?",f:"chetori",c:"Begrüßung & Höflichkeit"},{d:"Mir geht es gut",f:"khubam",c:"Begrüßung & Höflichkeit"},{d:"willkommen",f:"khosh âmadid",c:"Begrüßung & Höflichkeit"},
+{d:"Freut mich (dich kennenzulernen)",f:"khoshbakhtam",c:"Begrüßung & Höflichkeit"},{d:"Herr",f:"âghâ",c:"Begrüßung & Höflichkeit"},{d:"Frau (Anrede)",f:"khânom",c:"Begrüßung & Höflichkeit"},{d:"Freund/in",f:"dust",c:"Begrüßung & Höflichkeit"},
+{d:"Name",f:"esm",c:"Begrüßung & Höflichkeit"},{d:"okay / in Ordnung",f:"bâshe",c:"Begrüßung & Höflichkeit"},{d:"Prost / zum Wohl",f:"be salâmati",c:"Begrüßung & Höflichkeit"},{d:"Glückwunsch",f:"mobârak",c:"Begrüßung & Höflichkeit"},
+{d:"kein Problem",f:"eyb nadâre",c:"Begrüßung & Höflichkeit"},{d:"sehr gut / bravo",f:"âfarin",c:"Begrüßung & Höflichkeit"},{d:"Gast",f:"mehmân",c:"Begrüßung & Höflichkeit"},{d:"Nachbar",f:"hamsâye",c:"Begrüßung & Höflichkeit"},
+/* --- Essen & Trinken --- */
+{d:"Essen",f:"ghazâ",c:"Essen & Trinken"},{d:"Brot",f:"nân",c:"Essen & Trinken"},{d:"Wasser",f:"âb",c:"Essen & Trinken"},{d:"Tee",f:"chây",c:"Essen & Trinken"},
+{d:"Kaffee",f:"ghahve",c:"Essen & Trinken"},{d:"Milch",f:"shir",c:"Essen & Trinken"},{d:"Zucker",f:"shekar",c:"Essen & Trinken"},{d:"Salz",f:"namak",c:"Essen & Trinken"},
+{d:"Pfeffer",f:"felfel",c:"Essen & Trinken"},{d:"Reis",f:"berenj",c:"Essen & Trinken"},{d:"Fleisch",f:"gusht",c:"Essen & Trinken"},{d:"Hähnchen",f:"morgh",c:"Essen & Trinken"},
+{d:"Fisch (Essen)",f:"mâhi",c:"Essen & Trinken"},{d:"Ei",f:"tokhme morgh",c:"Essen & Trinken"},{d:"Käse",f:"panir",c:"Essen & Trinken"},{d:"Butter",f:"kare",c:"Essen & Trinken"},
+{d:"Joghurt",f:"mâst",c:"Essen & Trinken"},{d:"Obst",f:"mive",c:"Essen & Trinken"},{d:"Apfel",f:"sib",c:"Essen & Trinken"},{d:"Orange (Frucht)",f:"porteghâl",c:"Essen & Trinken"},
+{d:"Banane",f:"moz",c:"Essen & Trinken"},{d:"Traube",f:"angur",c:"Essen & Trinken"},{d:"Wassermelone",f:"hendevâne",c:"Essen & Trinken"},{d:"Melone",f:"kharboze",c:"Essen & Trinken"},
+{d:"Granatapfel",f:"anâr",c:"Essen & Trinken"},{d:"Kirsche",f:"gilâs",c:"Essen & Trinken"},{d:"Erdbeere",f:"tut farangi",c:"Essen & Trinken"},{d:"Pfirsich",f:"holu",c:"Essen & Trinken"},
+{d:"Birne",f:"golâbi",c:"Essen & Trinken"},{d:"Zitrone",f:"limu",c:"Essen & Trinken"},{d:"Gemüse",f:"sabzi",c:"Essen & Trinken"},{d:"Tomate",f:"goje farangi",c:"Essen & Trinken"},
+{d:"Gurke",f:"khiyâr",c:"Essen & Trinken"},{d:"Kartoffel",f:"sib zamini",c:"Essen & Trinken"},{d:"Zwiebel",f:"piyâz",c:"Essen & Trinken"},{d:"Knoblauch",f:"sir",c:"Essen & Trinken"},
+{d:"Karotte",f:"havij",c:"Essen & Trinken"},{d:"Salat",f:"sâlâd",c:"Essen & Trinken"},{d:"Suppe",f:"sup",c:"Essen & Trinken"},{d:"Nudeln",f:"mâkâroni",c:"Essen & Trinken"},
+{d:"Honig",f:"asal",c:"Essen & Trinken"},{d:"Marmelade",f:"morabbâ",c:"Essen & Trinken"},{d:"Kuchen",f:"keyk",c:"Essen & Trinken"},{d:"Süßigkeiten / Gebäck",f:"shirini",c:"Essen & Trinken"},
+{d:"Speiseeis",f:"bastani",c:"Essen & Trinken"},{d:"Saft",f:"âb mive",c:"Essen & Trinken"},{d:"Nüsse / Knabbermischung",f:"âjil",c:"Essen & Trinken"},{d:"Walnuss",f:"gerdu",c:"Essen & Trinken"},
+{d:"Frühstück",f:"sobhâne",c:"Essen & Trinken"},{d:"Mittagessen",f:"nâhâr",c:"Essen & Trinken"},{d:"Abendessen",f:"shâm",c:"Essen & Trinken"},{d:"hungrig",f:"gorosne",c:"Essen & Trinken"},
+{d:"durstig",f:"teshne",c:"Essen & Trinken"},{d:"lecker",f:"khoshmazze",c:"Essen & Trinken"},{d:"vegetarisch / Vegetarier",f:"giyâhkhâr",c:"Essen & Trinken"},{d:"Restaurant",f:"resturân",c:"Essen & Trinken"},
+/* --- Körper --- */
+{d:"Körper",f:"badan",c:"Körper"},{d:"Kopf",f:"sar",c:"Körper"},{d:"Gesicht",f:"surat",c:"Körper"},{d:"Auge",f:"cheshm",c:"Körper"},
+{d:"Ohr",f:"gush",c:"Körper"},{d:"Nase",f:"bini",c:"Körper"},{d:"Mund",f:"dahân",c:"Körper"},{d:"Zahn",f:"dandân",c:"Körper"},
+{d:"Lippe",f:"lab",c:"Körper"},{d:"Haar",f:"mu",c:"Körper"},{d:"Hals",f:"gardan",c:"Körper"},{d:"Schulter",f:"shâne",c:"Körper"},
+{d:"Arm",f:"bâzu",c:"Körper"},{d:"Hand",f:"dast",c:"Körper"},{d:"Finger",f:"angosht",c:"Körper"},{d:"Bauch",f:"shekam",c:"Körper"},
+{d:"Rücken",f:"kamar",c:"Körper"},{d:"Bein / Fuß",f:"pâ",c:"Körper"},{d:"Knie",f:"zânu",c:"Körper"},{d:"Herz",f:"ghalb",c:"Körper"},
+{d:"Blut",f:"khun",c:"Körper"},{d:"Haut",f:"pust",c:"Körper"},{d:"Knochen",f:"ostokhân",c:"Körper"},{d:"Zunge",f:"zabân",c:"Körper"},
+{d:"Gehirn",f:"maghz",c:"Körper"},{d:"Gesundheit",f:"salâmati",c:"Körper"},
+/* --- Kleidung --- */
+{d:"Kleidung",f:"lebâs",c:"Kleidung"},{d:"Hemd",f:"pirâhan",c:"Kleidung"},{d:"Hose",f:"shalvâr",c:"Kleidung"},{d:"Rock",f:"dâman",c:"Kleidung"},
+{d:"Mantel",f:"pâlto",c:"Kleidung"},{d:"Jacke",f:"kâpshan",c:"Kleidung"},{d:"Pullover",f:"poliver",c:"Kleidung"},{d:"Schuh",f:"kafsh",c:"Kleidung"},
+{d:"Socke",f:"jurâb",c:"Kleidung"},{d:"Hut / Mütze",f:"kolâh",c:"Kleidung"},{d:"Schal",f:"shâl",c:"Kleidung"},{d:"Handschuh",f:"dastkesh",c:"Kleidung"},
+{d:"Gürtel",f:"kamarband",c:"Kleidung"},{d:"Tasche",f:"kif",c:"Kleidung"},{d:"Brille",f:"eynak",c:"Kleidung"},{d:"Armbanduhr",f:"sâat",c:"Kleidung"},
+{d:"Ring",f:"angoshtar",c:"Kleidung"},{d:"T-Shirt",f:"tishert",c:"Kleidung"},{d:"Unterwäsche",f:"lebâs zir",c:"Kleidung"},{d:"Knopf",f:"dokme",c:"Kleidung"},
+{d:"Reißverschluss",f:"zip",c:"Kleidung"},{d:"Krawatte",f:"kerâvât",c:"Kleidung"},
+/* --- Haus & Möbel --- */
+{d:"Haus",f:"khâne",c:"Haus & Möbel"},{d:"Wohnung",f:"âpârtemân",c:"Haus & Möbel"},{d:"Zimmer",f:"otâgh",c:"Haus & Möbel"},{d:"Küche",f:"âshpazkhâne",c:"Haus & Möbel"},
+{d:"Bad",f:"hammâm",c:"Haus & Möbel"},{d:"Toilette",f:"dastshuyi",c:"Haus & Möbel"},{d:"Schlafzimmer",f:"otâgh khâb",c:"Haus & Möbel"},{d:"Wohnzimmer",f:"hâl",c:"Haus & Möbel"},
+{d:"Tür",f:"dar",c:"Haus & Möbel"},{d:"Fenster",f:"panjare",c:"Haus & Möbel"},{d:"Wand",f:"divâr",c:"Haus & Möbel"},{d:"Fußboden",f:"kaf",c:"Haus & Möbel"},
+{d:"Dach",f:"bâm",c:"Haus & Möbel"},{d:"Zimmerdecke",f:"saghf",c:"Haus & Möbel"},{d:"Treppe",f:"pelle",c:"Haus & Möbel"},{d:"Schlüssel",f:"kelid",c:"Haus & Möbel"},
+{d:"Tisch",f:"miz",c:"Haus & Möbel"},{d:"Stuhl",f:"sandali",c:"Haus & Möbel"},{d:"Bett",f:"takht",c:"Haus & Möbel"},{d:"Sofa",f:"mobl",c:"Haus & Möbel"},
+{d:"Schrank",f:"komod",c:"Haus & Möbel"},{d:"Regal",f:"ghafase",c:"Haus & Möbel"},{d:"Lampe",f:"cherâgh",c:"Haus & Möbel"},{d:"Spiegel",f:"âyene",c:"Haus & Möbel"},
+{d:"Teppich",f:"farsh",c:"Haus & Möbel"},{d:"Kissen",f:"bâlesh",c:"Haus & Möbel"},{d:"Bettdecke",f:"patu",c:"Haus & Möbel"},{d:"Kühlschrank",f:"yakhchâl",c:"Haus & Möbel"},
+{d:"Herd",f:"ojâgh",c:"Haus & Möbel"},{d:"Waschmaschine",f:"mâshin lebâsshuyi",c:"Haus & Möbel"},{d:"Fernseher",f:"televiziyon",c:"Haus & Möbel"},{d:"Garten",f:"bâgh",c:"Haus & Möbel"},
+{d:"Hof",f:"hayât",c:"Haus & Möbel"},
+/* --- Tiere --- */
+{d:"Tier",f:"heyvân",c:"Tiere"},{d:"Hund",f:"sag",c:"Tiere"},{d:"Katze",f:"gorbe",c:"Tiere"},{d:"Vogel",f:"parande",c:"Tiere"},
+{d:"Pferd",f:"asb",c:"Tiere"},{d:"Kuh",f:"gâv",c:"Tiere"},{d:"Schaf",f:"gusfand",c:"Tiere"},{d:"Ziege",f:"boz",c:"Tiere"},
+{d:"Hahn",f:"khorus",c:"Tiere"},{d:"Esel",f:"khar",c:"Tiere"},{d:"Kamel",f:"shotor",c:"Tiere"},{d:"Löwe",f:"shir",c:"Tiere"},
+{d:"Tiger",f:"babr",c:"Tiere"},{d:"Bär",f:"khers",c:"Tiere"},{d:"Wolf",f:"gorg",c:"Tiere"},{d:"Fuchs",f:"rubâh",c:"Tiere"},
+{d:"Hase / Kaninchen",f:"khargush",c:"Tiere"},{d:"Maus",f:"mush",c:"Tiere"},{d:"Elefant",f:"fil",c:"Tiere"},{d:"Affe",f:"meymun",c:"Tiere"},
+{d:"Schlange",f:"mâr",c:"Tiere"},{d:"Spinne",f:"ankabut",c:"Tiere"},{d:"Fliege",f:"magas",c:"Tiere"},{d:"Biene",f:"zanbur",c:"Tiere"},
+{d:"Ameise",f:"murche",c:"Tiere"},{d:"Schmetterling",f:"parvâne",c:"Tiere"},{d:"Ente",f:"ordak",c:"Tiere"},{d:"Adler",f:"oghâb",c:"Tiere"},
+{d:"Schildkröte",f:"lâkposht",c:"Tiere"},{d:"Frosch",f:"ghurbâghe",c:"Tiere"},
+/* --- Natur --- */
+{d:"Natur",f:"tabiat",c:"Natur"},{d:"Sonne",f:"khorshid",c:"Natur"},{d:"Mond",f:"mâh",c:"Natur"},{d:"Stern",f:"setâre",c:"Natur"},
+{d:"Himmel",f:"âsemân",c:"Natur"},{d:"Wolke",f:"abr",c:"Natur"},{d:"Regen",f:"bârân",c:"Natur"},{d:"Schnee",f:"barf",c:"Natur"},
+{d:"Wind",f:"bâd",c:"Natur"},{d:"Sturm",f:"tufân",c:"Natur"},{d:"Gewitter",f:"rad o bargh",c:"Natur"},{d:"Feuer",f:"âtash",c:"Natur"},
+{d:"Erde / Boden",f:"zamin",c:"Natur"},{d:"Meer",f:"daryâ",c:"Natur"},{d:"See",f:"daryâche",c:"Natur"},{d:"Fluss",f:"rudkhâne",c:"Natur"},
+{d:"Berg",f:"kuh",c:"Natur"},{d:"Wald",f:"jangal",c:"Natur"},{d:"Wüste",f:"biyâbân",c:"Natur"},{d:"Baum",f:"derakht",c:"Natur"},
+{d:"Blume",f:"gol",c:"Natur"},{d:"Gras",f:"chaman",c:"Natur"},{d:"Blatt",f:"barg",c:"Natur"},{d:"Stein",f:"sang",c:"Natur"},
+{d:"Sand",f:"shen",c:"Natur"},{d:"Insel",f:"jazire",c:"Natur"},{d:"Strand / Küste",f:"sâhel",c:"Natur"},{d:"Luft",f:"havâ",c:"Natur"},
+{d:"Wetter",f:"âb o havâ",c:"Natur"},{d:"Regenbogen",f:"rangin kamân",c:"Natur"},
+/* --- Zeit & Kalender --- */
+{d:"Zeit",f:"zamân",c:"Zeit & Kalender"},{d:"Stunde / Uhr(zeit)",f:"sâat",c:"Zeit & Kalender"},{d:"Minute",f:"daghighe",c:"Zeit & Kalender"},{d:"Sekunde",f:"sâniye",c:"Zeit & Kalender"},
+{d:"Tag",f:"ruz",c:"Zeit & Kalender"},{d:"Nacht",f:"shab",c:"Zeit & Kalender"},{d:"Morgen (Tageszeit)",f:"sobh",c:"Zeit & Kalender"},{d:"Mittag",f:"zohr",c:"Zeit & Kalender"},
+{d:"Nachmittag / Abend",f:"asr",c:"Zeit & Kalender"},{d:"heute",f:"emruz",c:"Zeit & Kalender"},{d:"gestern",f:"diruz",c:"Zeit & Kalender"},{d:"morgen",f:"fardâ",c:"Zeit & Kalender"},
+{d:"übermorgen",f:"pas fardâ",c:"Zeit & Kalender"},{d:"vorgestern",f:"pariruz",c:"Zeit & Kalender"},{d:"Woche",f:"hafte",c:"Zeit & Kalender"},{d:"Monat",f:"mâh",c:"Zeit & Kalender"},
+{d:"Jahr",f:"sâl",c:"Zeit & Kalender"},{d:"Jahrhundert",f:"gharn",c:"Zeit & Kalender"},{d:"Montag",f:"doshanbe",c:"Zeit & Kalender"},{d:"Dienstag",f:"seshanbe",c:"Zeit & Kalender"},
+{d:"Mittwoch",f:"chahârshanbe",c:"Zeit & Kalender"},{d:"Donnerstag",f:"panjshanbe",c:"Zeit & Kalender"},{d:"Freitag",f:"jome",c:"Zeit & Kalender"},{d:"Samstag",f:"shanbe",c:"Zeit & Kalender"},
+{d:"Sonntag",f:"yekshanbe",c:"Zeit & Kalender"},{d:"Frühling",f:"bahâr",c:"Zeit & Kalender"},{d:"Sommer",f:"tâbestân",c:"Zeit & Kalender"},{d:"Herbst",f:"pâyiz",c:"Zeit & Kalender"},
+{d:"Winter",f:"zemestân",c:"Zeit & Kalender"},{d:"jetzt",f:"alân",c:"Zeit & Kalender"},{d:"später",f:"badan",c:"Zeit & Kalender"},{d:"früh",f:"zud",c:"Zeit & Kalender"},
+{d:"spät",f:"dir",c:"Zeit & Kalender"},{d:"immer",f:"hamishe",c:"Zeit & Kalender"},{d:"nie",f:"hich vaght",c:"Zeit & Kalender"},{d:"manchmal",f:"gâhi",c:"Zeit & Kalender"},
+{d:"Kalender",f:"taghvim",c:"Zeit & Kalender"},{d:"Datum",f:"târikh",c:"Zeit & Kalender"},{d:"Geburtstag",f:"tavallod",c:"Zeit & Kalender"},
+/* --- Verben --- */
+{d:"sein",f:"budan",c:"Verben"},{d:"haben",f:"dâshtan",c:"Verben"},{d:"gehen",f:"raftan",c:"Verben"},{d:"kommen",f:"âmadan",c:"Verben"},
+{d:"machen / tun",f:"kardan",c:"Verben"},{d:"sagen",f:"goftan",c:"Verben"},{d:"sehen",f:"didan",c:"Verben"},{d:"hören",f:"shenidan",c:"Verben"},
+{d:"sprechen / reden",f:"harf zadan",c:"Verben"},{d:"essen",f:"khordan",c:"Verben"},{d:"trinken",f:"nushidan",c:"Verben"},{d:"schlafen",f:"khâbidan",c:"Verben"},
+{d:"aufwachen",f:"bidâr shodan",c:"Verben"},{d:"aufstehen",f:"boland shodan",c:"Verben"},{d:"sitzen",f:"neshastan",c:"Verben"},{d:"stehen",f:"istâdan",c:"Verben"},
+{d:"rennen / laufen",f:"davidan",c:"Verben"},{d:"schwimmen",f:"shenâ kardan",c:"Verben"},{d:"fliegen",f:"parvâz kardan",c:"Verben"},{d:"Auto fahren",f:"rânandegi kardan",c:"Verben"},
+{d:"kaufen",f:"kharidan",c:"Verben"},{d:"verkaufen",f:"forukhtan",c:"Verben"},{d:"bezahlen",f:"pardâkhtan",c:"Verben"},{d:"geben",f:"dâdan",c:"Verben"},
+{d:"nehmen / bekommen",f:"gereftan",c:"Verben"},{d:"bringen",f:"âvardan",c:"Verben"},{d:"finden",f:"peydâ kardan",c:"Verben"},{d:"suchen",f:"gashtan",c:"Verben"},
+{d:"verlieren (Sache)",f:"gom kardan",c:"Verben"},{d:"öffnen",f:"bâz kardan",c:"Verben"},{d:"schließen",f:"bastan",c:"Verben"},{d:"beginnen",f:"shoru kardan",c:"Verben"},
+{d:"beenden",f:"tamâm kardan",c:"Verben"},{d:"arbeiten",f:"kâr kardan",c:"Verben"},{d:"lernen",f:"yâd gereftan",c:"Verben"},{d:"beibringen / lehren",f:"yâd dâdan",c:"Verben"},
+{d:"lesen",f:"khândan",c:"Verben"},{d:"schreiben",f:"neveshtan",c:"Verben"},{d:"verstehen",f:"fahmidan",c:"Verben"},{d:"wissen",f:"dânestan",c:"Verben"},
+{d:"denken",f:"fekr kardan",c:"Verben"},{d:"glauben",f:"bâvar kardan",c:"Verben"},{d:"lieben / mögen",f:"dust dâshtan",c:"Verben"},{d:"wollen",f:"khâstan",c:"Verben"},
+{d:"können",f:"tavânestan",c:"Verben"},{d:"müssen",f:"bâyad",c:"Verben"},{d:"fragen",f:"porsidan",c:"Verben"},{d:"antworten",f:"javâb dâdan",c:"Verben"},
+{d:"helfen",f:"komak kardan",c:"Verben"},{d:"warten",f:"sabr kardan",c:"Verben"},{d:"spielen",f:"bâzi kardan",c:"Verben"},{d:"lachen",f:"khandidan",c:"Verben"},
+{d:"weinen",f:"gerye kardan",c:"Verben"},{d:"singen",f:"âvâz khândan",c:"Verben"},{d:"tanzen",f:"raghsidan",c:"Verben"},{d:"kochen",f:"âshpazi kardan",c:"Verben"},
+{d:"waschen",f:"shostan",c:"Verben"},{d:"putzen",f:"tamiz kardan",c:"Verben"},{d:"anziehen",f:"pushidan",c:"Verben"},{d:"ausziehen",f:"darâvardan",c:"Verben"},
+{d:"wohnen / leben",f:"zendegi kardan",c:"Verben"},{d:"sterben",f:"mordan",c:"Verben"},{d:"reisen",f:"safar kardan",c:"Verben"},{d:"ankommen",f:"residan",c:"Verben"},
+{d:"losfahren / aufbrechen",f:"harekat kardan",c:"Verben"},{d:"bleiben",f:"mândan",c:"Verben"},{d:"zurückkehren",f:"bargashtan",c:"Verben"},{d:"schicken",f:"ferestâdan",c:"Verben"},
+{d:"anrufen",f:"zang zadan",c:"Verben"},{d:"zeigen",f:"neshân dâdan",c:"Verben"},{d:"erklären",f:"towzih dâdan",c:"Verben"},{d:"vergessen",f:"farâmush kardan",c:"Verben"},
+{d:"sich erinnern",f:"be yâd âvardan",c:"Verben"},{d:"versuchen",f:"say kardan",c:"Verben"},{d:"brauchen",f:"niyâz dâshtan",c:"Verben"},{d:"hoffen",f:"omidvâr budan",c:"Verben"},
+{d:"bauen",f:"sâkhtan",c:"Verben"},{d:"zerbrechen",f:"shekastan",c:"Verben"},{d:"schneiden",f:"boridan",c:"Verben"},{d:"ziehen",f:"keshidan",c:"Verben"},
+{d:"drücken",f:"feshâr dâdan",c:"Verben"},{d:"werfen",f:"part kardan",c:"Verben"},{d:"riechen",f:"bu kardan",c:"Verben"},{d:"fühlen",f:"ehsâs kardan",c:"Verben"},
+{d:"treffen",f:"molâghât kardan",c:"Verben"},{d:"heiraten",f:"ezdevâj kardan",c:"Verben"},{d:"gewinnen",f:"bordan",c:"Verben"},{d:"verlieren (Spiel)",f:"bâkhtan",c:"Verben"},
+/* --- Adjektive --- */
+{d:"gut",f:"khub",c:"Adjektive"},{d:"schlecht",f:"bad",c:"Adjektive"},{d:"groß",f:"bozorg",c:"Adjektive"},{d:"klein",f:"kuchak",c:"Adjektive"},
+{d:"lang",f:"derâz",c:"Adjektive"},{d:"hoch / laut",f:"boland",c:"Adjektive"},{d:"kurz",f:"kutâh",c:"Adjektive"},{d:"neu",f:"jadid",c:"Adjektive"},
+{d:"alt (Sache)",f:"kohne",c:"Adjektive"},{d:"alt (Person)",f:"pir",c:"Adjektive"},{d:"jung",f:"javân",c:"Adjektive"},{d:"schön",f:"zibâ",c:"Adjektive"},
+{d:"hässlich",f:"zesht",c:"Adjektive"},{d:"schnell / scharf (Essen)",f:"tond",c:"Adjektive"},{d:"langsam",f:"âheste",c:"Adjektive"},{d:"stark",f:"ghavi",c:"Adjektive"},
+{d:"schwach",f:"zaif",c:"Adjektive"},{d:"schwer (Gewicht)",f:"sangin",c:"Adjektive"},{d:"leicht (Gewicht)",f:"sabok",c:"Adjektive"},{d:"schwierig",f:"sakht",c:"Adjektive"},
+{d:"einfach",f:"âsân",c:"Adjektive"},{d:"heiß",f:"dâgh",c:"Adjektive"},{d:"warm",f:"garm",c:"Adjektive"},{d:"kalt",f:"sard",c:"Adjektive"},
+{d:"kühl",f:"khonak",c:"Adjektive"},{d:"nass",f:"khis",c:"Adjektive"},{d:"trocken",f:"khoshk",c:"Adjektive"},{d:"sauber",f:"tamiz",c:"Adjektive"},
+{d:"schmutzig",f:"kasif",c:"Adjektive"},{d:"voll",f:"por",c:"Adjektive"},{d:"leer",f:"khâli",c:"Adjektive"},{d:"teuer",f:"gerân",c:"Adjektive"},
+{d:"billig",f:"arzân",c:"Adjektive"},{d:"reich",f:"puldâr",c:"Adjektive"},{d:"arm",f:"faghir",c:"Adjektive"},{d:"krank",f:"mariz",c:"Adjektive"},
+{d:"gesund",f:"sâlem",c:"Adjektive"},{d:"richtig",f:"dorost",c:"Adjektive"},{d:"falsch",f:"ghalat",c:"Adjektive"},{d:"wichtig",f:"mohem",c:"Adjektive"},
+{d:"interessant",f:"jâleb",c:"Adjektive"},{d:"langweilig",f:"kesel konande",c:"Adjektive"},{d:"leise / ruhig",f:"ârâm",c:"Adjektive"},{d:"hell",f:"roshan",c:"Adjektive"},
+{d:"dunkel",f:"târik",c:"Adjektive"},{d:"süß",f:"shirin",c:"Adjektive"},{d:"sauer",f:"torsh",c:"Adjektive"},{d:"salzig",f:"shur",c:"Adjektive"},
+{d:"bitter",f:"talkh",c:"Adjektive"},{d:"weit entfernt",f:"dur",c:"Adjektive"},{d:"nah",f:"nazdik",c:"Adjektive"},{d:"breit",f:"pahn",c:"Adjektive"},
+{d:"eng",f:"tang",c:"Adjektive"},{d:"tief",f:"amigh",c:"Adjektive"},{d:"frei",f:"âzâd",c:"Adjektive"},{d:"beschäftigt",f:"mashghul",c:"Adjektive"},
+{d:"gefährlich",f:"khatarnâk",c:"Adjektive"},{d:"sicher",f:"amn",c:"Adjektive"},{d:"möglich",f:"momken",c:"Adjektive"},{d:"bereit / fertig",f:"âmâde",c:"Adjektive"},
+{d:"dick",f:"châgh",c:"Adjektive"},{d:"dünn / schlank",f:"lâghar",c:"Adjektive"},{d:"offen",f:"bâz",c:"Adjektive"},{d:"geschlossen",f:"baste",c:"Adjektive"},
+/* --- Fragewörter --- */
+{d:"was",f:"chi",c:"Fragewörter"},{d:"wer",f:"ki",c:"Fragewörter"},{d:"wo",f:"kojâ",c:"Fragewörter"},{d:"wann",f:"key",c:"Fragewörter"},
+{d:"warum",f:"cherâ",c:"Fragewörter"},{d:"wie",f:"chetor",c:"Fragewörter"},{d:"wie viel",f:"cheghadr",c:"Fragewörter"},{d:"wie viele",f:"chand tâ",c:"Fragewörter"},
+{d:"welche/r",f:"kodâm",c:"Fragewörter"},{d:"woher",f:"az kojâ",c:"Fragewörter"},{d:"wohin",f:"be kojâ",c:"Fragewörter"},{d:"wessen",f:"mâle ki",c:"Fragewörter"},
+/* --- Reisen & Verkehr --- */
+{d:"Reise",f:"safar",c:"Reisen & Verkehr"},{d:"Auto",f:"mâshin",c:"Reisen & Verkehr"},{d:"Bus",f:"otobus",c:"Reisen & Verkehr"},{d:"Zug",f:"ghatâr",c:"Reisen & Verkehr"},
+{d:"Flugzeug",f:"havâpeymâ",c:"Reisen & Verkehr"},{d:"Fahrrad",f:"docharkhe",c:"Reisen & Verkehr"},{d:"Motorrad",f:"motor",c:"Reisen & Verkehr"},{d:"Taxi",f:"tâksi",c:"Reisen & Verkehr"},
+{d:"Schiff",f:"keshti",c:"Reisen & Verkehr"},{d:"Bahnhof",f:"istgâhe ghatâr",c:"Reisen & Verkehr"},{d:"Flughafen",f:"forudgâh",c:"Reisen & Verkehr"},{d:"Straße",f:"khiyâbân",c:"Reisen & Verkehr"},
+{d:"Weg",f:"râh",c:"Reisen & Verkehr"},{d:"Brücke",f:"pol",c:"Reisen & Verkehr"},{d:"Ampel",f:"cherâgh ghermez",c:"Reisen & Verkehr"},{d:"Ticket / Fahrkarte",f:"belit",c:"Reisen & Verkehr"},
+{d:"Reisepass",f:"pâsport",c:"Reisen & Verkehr"},{d:"Visum",f:"vizâ",c:"Reisen & Verkehr"},{d:"Hotel",f:"hotel",c:"Reisen & Verkehr"},{d:"Koffer",f:"chamedân",c:"Reisen & Verkehr"},
+{d:"Rucksack",f:"kule poshti",c:"Reisen & Verkehr"},{d:"Landkarte",f:"naghshe",c:"Reisen & Verkehr"},{d:"Stadt",f:"shahr",c:"Reisen & Verkehr"},{d:"Dorf",f:"rustâ",c:"Reisen & Verkehr"},
+{d:"Land (Staat)",f:"keshvar",c:"Reisen & Verkehr"},{d:"Ausland",f:"khârej",c:"Reisen & Verkehr"},{d:"Grenze",f:"marz",c:"Reisen & Verkehr"},{d:"links",f:"chap",c:"Reisen & Verkehr"},
+{d:"rechts",f:"râst",c:"Reisen & Verkehr"},{d:"geradeaus",f:"mostaghim",c:"Reisen & Verkehr"},{d:"Benzin",f:"benzin",c:"Reisen & Verkehr"},{d:"Parkplatz",f:"pârking",c:"Reisen & Verkehr"},
+/* --- Beruf --- */
+{d:"Beruf",f:"shoghl",c:"Beruf"},{d:"Arbeit",f:"kâr",c:"Beruf"},{d:"Lehrer/in",f:"moallem",c:"Beruf"},{d:"Schüler/in",f:"dânesh âmuz",c:"Beruf"},
+{d:"Student/in",f:"dâneshju",c:"Beruf"},{d:"Arzt / Ärztin",f:"doktor",c:"Beruf"},{d:"Krankenpfleger/in",f:"parastâr",c:"Beruf"},{d:"Ingenieur/in",f:"mohandes",c:"Beruf"},
+{d:"Polizist/in",f:"polis",c:"Beruf"},{d:"Koch / Köchin",f:"âshpaz",c:"Beruf"},{d:"Fahrer/in",f:"rânande",c:"Beruf"},{d:"Verkäufer/in",f:"forushande",c:"Beruf"},
+{d:"Bauer / Bäuerin",f:"keshâvarz",c:"Beruf"},{d:"Anwalt / Anwältin",f:"vakil",c:"Beruf"},{d:"Schriftsteller/in",f:"nevisande",c:"Beruf"},{d:"Künstler/in",f:"honarmand",c:"Beruf"},
+{d:"Sänger/in",f:"khânande",c:"Beruf"},{d:"Schauspieler/in",f:"bâzigar",c:"Beruf"},{d:"Friseur/in",f:"ârâyeshgar",c:"Beruf"},{d:"Bäcker/in",f:"nânvâ",c:"Beruf"},
+{d:"Chef/in",f:"rais",c:"Beruf"},{d:"Kollege / Kollegin",f:"hamkâr",c:"Beruf"},{d:"Büro / Amt",f:"edâre",c:"Beruf"},{d:"Schule",f:"madrese",c:"Beruf"},
+{d:"Universität",f:"dâneshgâh",c:"Beruf"},{d:"Krankenhaus",f:"bimârestân",c:"Beruf"},{d:"Geschäft / Laden",f:"maghâze",c:"Beruf"},{d:"Gehalt",f:"hoghugh",c:"Beruf"},
+{d:"Kunde / Kundin",f:"moshtari",c:"Beruf"},
+/* --- Gefühle --- */
+{d:"Gefühl",f:"ehsâs",c:"Gefühle"},{d:"Liebe",f:"eshgh",c:"Gefühle"},{d:"Freude",f:"shâdi",c:"Gefühle"},{d:"glücklich",f:"khoshhâl",c:"Gefühle"},
+{d:"traurig",f:"ghamgin",c:"Gefühle"},{d:"müde",f:"khaste",c:"Gefühle"},{d:"Angst",f:"tars",c:"Gefühle"},{d:"Wut",f:"khashm",c:"Gefühle"},
+{d:"wütend",f:"asabâni",c:"Gefühle"},{d:"Hoffnung",f:"omid",c:"Gefühle"},{d:"Traum",f:"royâ",c:"Gefühle"},{d:"Überraschung",f:"sorpriz",c:"Gefühle"},
+{d:"Scham / Verlegenheit",f:"khejâlat",c:"Gefühle"},{d:"schüchtern",f:"khejâlati",c:"Gefühle"},{d:"stolz / eingebildet",f:"maghrur",c:"Gefühle"},{d:"eifersüchtig / neidisch",f:"hasud",c:"Gefühle"},
+{d:"allein / einsam",f:"tanhâ",c:"Gefühle"},{d:"lustig / witzig",f:"bâmaze",c:"Gefühle"},{d:"Sorge",f:"negarâni",c:"Gefühle"},{d:"besorgt",f:"negarân",c:"Gefühle"},
+{d:"verliebt",f:"âshegh",c:"Gefühle"},{d:"Träne",f:"ashk",c:"Gefühle"},{d:"Lächeln",f:"labkhand",c:"Gefühle"},
+/* --- Alltag --- */
+{d:"Ding / Sache",f:"chiz",c:"Alltag"},{d:"Geld",f:"pul",c:"Alltag"},{d:"Telefon",f:"telefon",c:"Alltag"},{d:"Handy",f:"mobâyl",c:"Alltag"},
+{d:"Computer",f:"kâmpiuter",c:"Alltag"},{d:"Internet",f:"internet",c:"Alltag"},{d:"Buch",f:"ketâb",c:"Alltag"},{d:"Zeitung",f:"ruznâme",c:"Alltag"},
+{d:"Brief",f:"nâme",c:"Alltag"},{d:"Kugelschreiber",f:"khodkâr",c:"Alltag"},{d:"Bleistift",f:"medâd",c:"Alltag"},{d:"Papier",f:"kâghaz",c:"Alltag"},
+{d:"Schere",f:"gheychi",c:"Alltag"},{d:"Geschenk",f:"hediye",c:"Alltag"},{d:"Musik",f:"musighi",c:"Alltag"},{d:"Film",f:"film",c:"Alltag"},
+{d:"Foto",f:"aks",c:"Alltag"},{d:"Spiel",f:"bâzi",c:"Alltag"},{d:"Ball",f:"tup",c:"Alltag"},{d:"Sport",f:"varzesh",c:"Alltag"},
+{d:"Fußball",f:"futbâl",c:"Alltag"},{d:"Nachricht",f:"payâm",c:"Alltag"},{d:"Frage",f:"soâl",c:"Alltag"},{d:"Antwort",f:"javâb",c:"Alltag"},
+{d:"Wort",f:"kalame",c:"Alltag"},{d:"Sprache",f:"zabân",c:"Alltag"},{d:"Satz",f:"jomle",c:"Alltag"},{d:"Stimme / Geräusch",f:"sedâ",c:"Alltag"},
+{d:"Licht",f:"nur",c:"Alltag"},{d:"Schatten",f:"sâye",c:"Alltag"},{d:"Problem",f:"moshkel",c:"Alltag"},{d:"Hilfe",f:"komak",c:"Alltag"},
+{d:"Idee",f:"ide",c:"Alltag"},{d:"Neuigkeit",f:"khabar",c:"Alltag"},{d:"Ort / Platz",f:"jâ",c:"Alltag"},{d:"Seife",f:"sâbun",c:"Alltag"},
+{d:"Zahnbürste",f:"mesvâk",c:"Alltag"},{d:"Handtuch",f:"hole",c:"Alltag"},{d:"Messer",f:"châghu",c:"Alltag"},{d:"Gabel",f:"changâl",c:"Alltag"},
+{d:"Löffel",f:"ghâshogh",c:"Alltag"},{d:"Teller",f:"boshghâb",c:"Alltag"},{d:"Glas (Trinkglas)",f:"livân",c:"Alltag"},{d:"Tasse",f:"fenjân",c:"Alltag"},
+{d:"Flasche",f:"botri",c:"Alltag"},{d:"Kochtopf",f:"ghâblame",c:"Alltag"},{d:"Müll",f:"âshghâl",c:"Alltag"},{d:"Preis",f:"gheymat",c:"Alltag"},
+{d:"Markt / Basar",f:"bâzâr",c:"Alltag"},{d:"Apotheke",f:"dârukhâne",c:"Alltag"},{d:"Medikament",f:"dâru",c:"Alltag"},{d:"Post",f:"post",c:"Alltag"},
+{d:"Bank (Geldinstitut)",f:"bânk",c:"Alltag"},{d:"Regenschirm",f:"chatr",c:"Alltag"},{d:"Nummer",f:"shomâre",c:"Alltag"},{d:"Adresse",f:"âdres",c:"Alltag"},
+{d:"Welt",f:"donyâ",c:"Alltag"},{d:"Leben",f:"zendegi",c:"Alltag"},{d:"Tod",f:"marg",c:"Alltag"},{d:"Gott",f:"khodâ",c:"Alltag"},
+{d:"Mensch",f:"ensân",c:"Alltag"},{d:"Leute",f:"mardom",c:"Alltag"},{d:"Schlange (Warteschlange)",f:"saf",c:"Alltag"},{d:"Feiertag / frei",f:"tatil",c:"Alltag"}
+/* >>> HIER weitere Vokabeln ergänzen (gleiche Struktur, Komma nicht vergessen) <<< */
+];
+
+/* =====================================================================
+   KATEGORIEN & KONSTANTEN
+   ===================================================================== */
+const CAT_ICONS = {
+  "Zahlen":"🔢","Farben":"🎨","Familie":"👨‍👩‍👧","Begrüßung & Höflichkeit":"👋",
+  "Essen & Trinken":"🍲","Körper":"🫀","Kleidung":"👕","Haus & Möbel":"🏠",
+  "Tiere":"🐪","Natur":"🌿","Zeit & Kalender":"🕰️","Verben":"🏃","Adjektive":"✨",
+  "Fragewörter":"❓","Reisen & Verkehr":"✈️","Beruf":"💼","Gefühle":"❤️","Alltag":"🧺"
+};
+const CATS = [...new Set(VOCAB.map(v=>v.c))];
+const DAILY_COUNT = 15;
+const PRAISE = ["Âfarin! 👏","Super!","Kheyli khub! 🌟","Stark!","Genau richtig!","Weiter so! 🚀","Perfekt!","Du bist auf Kurs! 🐪"];
+const CHEER_WRONG = ["Kein Problem – beim nächsten Mal!","Fast! Das Wort kommt wieder.","Merk es dir – die Karawane wartet auf dich. 🐪","Fehler gehören zum Lernen!"];
+
+/* =====================================================================
+   ZUSTAND (localStorage)
+   ===================================================================== */
+const KEY = "farsiKarawaneV1";
+function defaultState(){
+  return { xp:0, streak:0, lastTestDay:null, weeklyDone:null, days:{}, words:{}, badges:[], sound:true, games:{} };
+}
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){ const s = JSON.parse(raw); if(s && typeof s === "object") return Object.assign(defaultState(), s); }
+  }catch(e){}
+  return defaultState();
+}
+let S = load();
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+function dstr(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function todayStr(){ return dstr(new Date()); }
+function yesterdayStr(){ const d=new Date(); d.setDate(d.getDate()-1); return dstr(d); }
+
+function getW(id){
+  if(!S.words[id]) S.words[id] = { s:0, m:false, w:false, lc:null, seen:false };
+  return S.words[id];
+}
+
+/* =====================================================================
+   XP, LEVEL, STREAK, TOAST, KONFETTI, SOUND
+   ===================================================================== */
+function levelInfo(){
+  let l=1, need=100, base=0;
+  while(S.xp >= base+need){ base+=need; l++; need = 100 + (l-1)*50; }
+  return { l:l, cur:S.xp-base, need:need };
+}
+function addXP(n){
+  const before = levelInfo().l;
+  S.xp += n;
+  const after = levelInfo().l;
+  save(); renderHeader();
+  if(after > before){
+    toast("🎉 Level "+after+" erreicht!");
+    confetti(80); sfx("fanfare");
+  }
+}
+function updateDayStreak(){
+  const t = todayStr();
+  if(S.lastTestDay === t) return;
+  S.streak = (S.lastTestDay === yesterdayStr()) ? S.streak+1 : 1;
+  S.lastTestDay = t;
+  save(); renderHeader();
+}
+let toastTimer = null;
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove("show"), 2200);
+}
+function confetti(n){
+  const cols = ["#F2A81D","#14A39A","#2B5FC7","#C33C54","#7BC950"];
+  for(let i=0;i<n;i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random()*100+"vw";
+    c.style.background = cols[Math.floor(Math.random()*cols.length)];
+    c.style.animationDuration = (1.6+Math.random()*1.6)+"s";
+    c.style.borderRadius = Math.random()>.5 ? "50%" : "3px";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 3500);
+  }
+}
+let AC = null;
+function tone(freq, t0, dur, type, vol){
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = type||"sine"; o.frequency.value = freq;
+  g.gain.setValueAtTime(vol||0.15, AC.currentTime+t0);
+  g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime+t0+dur);
+  o.connect(g); g.connect(AC.destination);
+  o.start(AC.currentTime+t0); o.stop(AC.currentTime+t0+dur+0.05);
+}
+function sfx(kind){
+  if(!S.sound) return;
+  try{
+    if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==="suspended") AC.resume();
+    if(kind==="ok"){ tone(660,0,.12); tone(880,.12,.18); }
+    else if(kind==="bad"){ tone(220,0,.25,"square",.08); }
+    else if(kind==="click"){ tone(500,0,.06,"triangle",.08); }
+    else if(kind==="fanfare"){ tone(523,0,.15); tone(659,.15,.15); tone(784,.3,.15); tone(1047,.45,.4); }
+  }catch(e){}
+}
+function toggleSound(){
+  S.sound = !S.sound; save();
+  document.getElementById("sound-toggle").textContent = S.sound ? "🔊" : "🔇";
+  toast(S.sound ? "Ton an" : "Ton aus");
+}
+
+/* =====================================================================
+   ANTWORT-BEWERTUNG (Levenshtein + relative Schwelle)
+   ===================================================================== */
+function norm(s){
+  return String(s).toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[’'ʼ`\-_.]/g,"")
+    .replace(/\s+/g," ").trim();
+}
+function lev(a,b){
+  const m=a.length, n=b.length;
+  if(!m) return n; if(!n) return m;
+  let prev = new Array(n+1), cur = new Array(n+1);
+  for(let j=0;j<=n;j++) prev[j]=j;
+  for(let i=1;i<=m;i++){
+    cur[0]=i;
+    for(let j=1;j<=n;j++){
+      cur[j] = Math.min(prev[j]+1, cur[j-1]+1, prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    }
+    const t=prev; prev=cur; cur=t;
+  }
+  return prev[n];
+}
+/* Ergebnis: "correct" | "similar" | "wrong" */
+function evalAnswer(input, solution){
+  const a = norm(input), b = norm(solution);
+  if(!a) return "wrong";
+  if(a === b) return "correct";
+  const d = lev(a,b);
+  const L = Math.max(a.length, b.length);
+  const thr = L<=4 ? 1 : (L<=7 ? 2 : Math.round(L*0.3));
+  return d <= thr ? "similar" : "wrong";
+}
+
+/* =====================================================================
+   DAILY WORDS – Auswahl & Test-Logik
+   ===================================================================== */
+function usedIds(){
+  const set = new Set();
+  Object.values(S.days).forEach(day => day.ids.forEach(id => set.add(id)));
+  return set;
+}
+function ensureToday(){
+  const t = todayStr();
+  if(S.days[t]) return S.days[t];
+  const used = usedIds();
+  const byCat = {};
+  VOCAB.forEach((v,i)=>{ if(!used.has(i)){ (byCat[v.c] = byCat[v.c]||[]).push(i); } });
+  Object.values(byCat).forEach(arr => shuffle(arr));
+  const cats = shuffle(Object.keys(byCat));
+  const ids = [];
+  let guard = 0;
+  while(ids.length < DAILY_COUNT && guard < 5000){
+    let added = false;
+    for(const c of cats){
+      if(ids.length >= DAILY_COUNT) break;
+      if(byCat[c].length){ ids.push(byCat[c].pop()); added = true; }
+    }
+    if(!added) break;
+    guard++;
+  }
+  S.days[t] = { ids:ids, learned:false, tested:false, res:{} };
+  save();
+  return S.days[t];
+}
+function repeatPool(){
+  const ids = [];
+  Object.keys(S.words).forEach(id=>{
+    const w = S.words[id];
+    if(w.w && !w.m) ids.push(Number(id));
+  });
+  return ids;
+}
+function buildTestSet(){
+  const dayKeys = Object.keys(S.days).sort().reverse().slice(0,3);
+  const set = new Set();
+  dayKeys.forEach(k => S.days[k].ids.forEach(id => set.add(id)));
+  repeatPool().forEach(id => set.add(id));
+  return shuffle([...set]);
+}
+function weekKey(){
+  const d = new Date();
+  const off = (d.getDay()+6)%7; /* Montag als Wochenstart */
+  d.setDate(d.getDate()-off);
+  return dstr(d);
+}
+function weeklySet(){
+  /* 15 zufällige Wörter aus ALLEM, was schon gelernt wurde – beliebig oft spielbar */
+  return shuffle([...usedIds()]).slice(0, 15);
+}
+/* Zähler "richtig in Folge": zählt nur EINMAL pro Tag pro Wort */
+function markAnswer(id, ok){
+  const t = todayStr();
+  const w = getW(id);
+  if(w.lc !== t){
+    if(ok){
+      w.s++;
+      if(w.s >= 3 && !w.m){
+        w.m = true;
+        setTimeout(()=>{ toast("🏆 Gemeistert: „"+VOCAB[id].f+"“ (3 Tage in Folge!)"); }, 600);
+        addXP(20);
+      }
+    } else {
+      w.s = 0; w.w = true; w.m = false;
+    }
+    w.lc = t;
+  }
+  const day = S.days[t];
+  if(day) day.res[id] = ok;
+  addXP(ok ? 10 : 0);
+  save();
+  checkBadges();
+}
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i];a[i]=a[j];a[j]=t; }
+  return a;
+}
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+/* =====================================================================
+   ABZEICHEN
+   ===================================================================== */
+const BADGES = [
+  { id:"first",   em:"🐪", t:"Erster Test",        chk:()=> S.lastTestDay !== null },
+  { id:"streak3", em:"🔥", t:"3-Tage-Streak",      chk:()=> S.streak >= 3 },
+  { id:"streak7", em:"🌋", t:"7-Tage-Streak",      chk:()=> S.streak >= 7 },
+  { id:"streak30",em:"☄️", t:"30-Tage-Streak",     chk:()=> S.streak >= 30 },
+  { id:"m10",     em:"🌱", t:"10 gemeistert",      chk:()=> masteredCount() >= 10 },
+  { id:"m50",     em:"🌸", t:"50 gemeistert",      chk:()=> masteredCount() >= 50 },
+  { id:"m100",    em:"🌳", t:"100 gemeistert",     chk:()=> masteredCount() >= 100 },
+  { id:"m250",    em:"🏔️", t:"250 gemeistert",     chk:()=> masteredCount() >= 250 },
+  { id:"xp500",   em:"⭐", t:"500 XP",             chk:()=> S.xp >= 500 },
+  { id:"xp2000",  em:"💫", t:"2000 XP",            chk:()=> S.xp >= 2000 },
+  { id:"games",   em:"🎮", t:"Alle Spiele gespielt",chk:()=> S.games.memory && S.games.blitz && S.games.scramble },
+  { id:"weekly",  em:"🗓️", t:"Weekly Challenge",    chk:()=> S.weeklyDone !== null },
+  { id:"cat1",    em:"🏅", t:"1 Kategorie komplett",chk:()=> CATS.some(c => catMastered(c) >= catTotal(c)) }
+];
+function masteredCount(){ return Object.values(S.words).filter(w=>w.m).length; }
+function catTotal(c){ return VOCAB.filter(v=>v.c===c).length; }
+function catMastered(c){
+  let n=0; VOCAB.forEach((v,i)=>{ if(v.c===c && S.words[i] && S.words[i].m) n++; });
+  return n;
+}
+function checkBadges(){
+  BADGES.forEach(b=>{
+    if(!S.badges.includes(b.id) && b.chk()){
+      S.badges.push(b.id); save();
+      setTimeout(()=>{ toast(b.em+" Abzeichen: "+b.t+"!"); confetti(60); sfx("fanfare"); }, 300);
+    }
+  });
+}
+
+/* =====================================================================
+   KOPFZEILE & ROUTER
+   ===================================================================== */
+function renderHeader(){
+  const li = levelInfo();
+  document.getElementById("hdr-streak").textContent = S.streak;
+  document.getElementById("hdr-level").textContent = li.l;
+  document.getElementById("hdr-xp").textContent = S.xp+" XP";
+  document.getElementById("hdr-xpnext").textContent = "noch "+(li.need-li.cur)+" XP bis Level "+(li.l+1);
+  document.getElementById("hdr-xpfill").style.width = Math.round(li.cur/li.need*100)+"%";
+}
+let TIMERS = [];
+function clearTimers(){ TIMERS.forEach(clearInterval); TIMERS = []; }
+const APP = () => document.getElementById("app");
+function go(view, arg){
+  clearTimers();
+  window.scrollTo(0,0);
+  if(view==="home") viewHome();
+  else if(view==="daily") viewDaily();
+  else if(view==="learn") viewLearn();
+  else if(view==="test") startTest("daily");
+  else if(view==="weekly") startTest("weekly");
+  else if(view==="history") viewHistory();
+  else if(view==="histDay") viewHistDay(arg);
+  else if(view==="wrongCat") viewWrongCat();
+  else if(view==="wrongPractice") startTest("wrong");
+  else if(view==="random30") startTest("random30");
+  else if(view==="cats") viewCats();
+  else if(view==="cat") viewCat(arg);
+  else if(view==="catPractice") startTest("cat", arg);
+  else if(view==="games") viewGames();
+  else if(view==="memory") viewMemory();
+  else if(view==="blitz") viewBlitz();
+  else if(view==="scramble") viewScramble();
+  else if(view==="progress") viewProgress();
+}
+
+/* =====================================================================
+   STARTBILDSCHIRM
+   ===================================================================== */
+function viewHome(){
+  const t = todayStr();
+  const day = S.days[t];
+  let dailyStatus = "15 neue Wörter warten";
+  if(day && day.tested) dailyStatus = "Heute erledigt ✔ – Spiele freigeschaltet!";
+  else if(day && day.learned) dailyStatus = "Gelernt ✔ – jetzt zum Test!";
+  else if(day) dailyStatus = "Angefangen – weiter lernen!";
+  const pool = repeatPool().length;
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>Salâm! 👋</h2>
+    <p class="muted">Deine tägliche Vokabel-Karawane durch die Farsi-Welt.</p>
+    <div class="menu-grid">
+      <button class="menu-tile" onclick="go('daily')">
+        <div class="icon">📅</div>
+        <div><b>Daily Words</b><small>${dailyStatus}</small></div>
+      </button>
+      <button class="menu-tile" onclick="go('weekly')">
+        <div class="icon">🗓️</div>
+        <div><b>Weekly Challenge</b><small>15 zufällige gelernte Wörter (${usedIds().size} im Topf) – so oft du willst${S.weeklyDone===weekKey() ? " · Wochenbonus ✔" : ""}</small></div>
+      </button>
+      <button class="menu-tile" onclick="go('random30')">
+        <div class="icon">🎲</div>
+        <div><b>Random 30</b><small>${usedIds().size >= 30 ? "30 zufällige Wörter aus allen "+usedIds().size+" gelernten – auch längst gemeisterte" : "ab 30 gelernten Wörtern (aktuell "+usedIds().size+")"}</small></div>
+      </button>
+      <button class="menu-tile" onclick="go('wrongCat')">
+        <div class="icon" style="background:var(--bad-soft)">🔁</div>
+        <div><b>Falsch beim Test</b><small>${repeatPool().length} Wörter zum Wiederholen</small></div>
+      </button>
+      <button class="menu-tile" onclick="go('cats')">
+        <div class="icon">🗂️</div>
+        <div><b>Nach Kategorie lernen</b><small>${CATS.length} Kategorien · ${VOCAB.length} Wörter</small></div>
+      </button>
+      <button class="menu-tile" onclick="go('games')">
+        <div class="icon">🎮</div>
+        <div><b>Minispiele</b><small>Memory, Blitz-Quiz &amp; Wirrwarr</small></div>
+      </button>
+      <button class="menu-tile" onclick="go('progress')">
+        <div class="icon">🏆</div>
+        <div><b>Fortschritt &amp; Abzeichen</b><small>${masteredCount()} gemeistert · ${pool} im Wiederhol-Pool</small></div>
+      </button>
+    </div>
+  </div>`;
+}
+
+/* =====================================================================
+   DAILY WORDS – Übersicht
+   ===================================================================== */
+function viewDaily(){
+  const day = ensureToday();
+  if(day.ids.length === 0){
+    APP().innerHTML = `<div class="screen card center"><h2>🎓 Wow!</h2><p>Du hast alle ${VOCAB.length} Vokabeln der Datenbank durchgearbeitet. Ergänze neue Wörter in der Datei, um weiterzumachen!</p><button class="btn" onclick="go('home')">Zurück</button></div>`;
+    return;
+  }
+  const testCount = buildTestSet().length;
+  const pool = repeatPool().length;
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>📅 Daily Words</h2>
+    <div class="card">
+      <h3>1️⃣ Lernen ${day.learned ? "✔" : ""}</h3>
+      <p class="muted">Präg dir die ${day.ids.length} neuen Wörter von heute ein.</p>
+      <button class="btn turq" onclick="go('learn')"><span class="big-emoji">🧠</span> ${day.learned ? "Nochmal ansehen" : "Jetzt lernen"}</button>
+    </div>
+    <div class="card">
+      <h3>2️⃣ Test ${day.tested ? "✔" : ""}</h3>
+      <p class="muted">${testCount} Wörter: die letzten 3 Tage + dein Wiederhol-Pool (${pool} Wörter). Ein Wort gilt erst nach <b>3 Tagen in Folge richtig</b> als gemeistert.</p>
+      <button class="btn ${day.tested ? "ghost" : ""}" onclick="go('test')" ${day.learned ? "" : "disabled"}><span class="big-emoji">✏️</span> ${day.tested ? "Test wiederholen (zählt nicht doppelt)" : "Test starten"}</button>
+      ${day.learned ? "" : '<p class="muted center" style="margin:6px 0 0;font-size:.85rem">Erst lernen, dann testen 😉</p>'}
+    </div>
+    <div class="card">
+      <h3>3️⃣ Spielen</h3>
+      <p class="muted">Festige die heutigen Wörter + deinen Wiederhol-Pool spielerisch.</p>
+      <button class="btn saffron" onclick="go('games')"><span class="big-emoji">🎮</span> Zu den Spielen</button>
+    </div>
+    <div class="card">
+      <h3>📖 Vergangene Daily Words</h3>
+      <p class="muted">Schau nach, welche Wörter du an welchem Tag gelernt hast, und wiederhole sie jederzeit.</p>
+      <button class="btn ghost" onclick="go('history')"><span class="big-emoji">📖</span> Verlauf öffnen (${Object.keys(S.days).length} Tage)</button>
+    </div>
+  </div>`;
+}
+
+/* =====================================================================
+   LERN-MODUS (Karteikarten)
+   ===================================================================== */
+let FC = null;
+function viewLearn(){
+  const day = ensureToday();
+  FC = { ids: day.ids.slice(), i: 0, mode: "daily" };
+  renderFlash("Neue Wörter heute");
+}
+function renderFlash(title){
+  const id = FC.ids[FC.i];
+  const v = VOCAB[id];
+  const w = getW(id);
+  if(!w.seen){ w.seen = true; addXP(1); save(); }
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>🧠 ${esc(title)}</h2>
+    <div class="counter">Karte ${FC.i+1} von ${FC.ids.length}</div>
+    <div class="flash-wrap">
+      <div class="flash" id="flash" onclick="this.classList.toggle('flipped'); sfx('click')">
+        <div class="face">
+          <div class="tag">${esc(v.c)}</div>
+          <div class="word">${esc(v.d)}</div>
+          <div class="hint">Tippen zum Umdrehen 🔄</div>
+        </div>
+        <div class="face back">
+          <div class="tag">Farsi</div>
+          <div class="word">${esc(v.f)}</div>
+          <div class="hint">${esc(v.d)}</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn ghost" onclick="flashMove(-1)" ${FC.i===0?"disabled":""}>◀ Zurück</button>
+      <button class="btn" onclick="flashMove(1)">${FC.i===FC.ids.length-1 ? "Fertig ✔" : "Weiter ▶"}</button>
+    </div>
+  </div>`;
+}
+function flashMove(dir){
+  FC.i += dir;
+  if(FC.i >= FC.ids.length){
+    if(FC.mode === "daily"){
+      const day = ensureToday();
+      if(!day.learned){ day.learned = true; save(); addXP(15); confetti(40); sfx("ok"); toast("+15 XP – alle Wörter angesehen!"); }
+      go("daily");
+    } else if(FC.mode === "hist"){ go("histDay", FC.date); }
+    else if(FC.mode === "wrong"){ go("wrongCat"); }
+    else { go("cat", FC.cat); }
+    return;
+  }
+  if(FC.i < 0) FC.i = 0;
+  renderFlash(FC.mode==="daily" ? "Neue Wörter heute" : (FC.title || CATS[FC.cat]));
+}
+
+/* =====================================================================
+   TEST / SCHREIB-TRAINING (Tippen + Ähnlichkeitsprüfung)
+   ===================================================================== */
+let T = null;
+function startTest(mode, catIdx){
+  let list;
+  if(mode === "daily"){
+    ensureToday();
+    list = buildTestSet();
+  } else if(mode === "weekly"){
+    list = weeklySet();
+    if(!list.length){ toast("Noch keine Wörter gelernt – starte erst Daily Words!"); go("daily"); return; }
+  } else if(mode === "wrong"){
+    list = shuffle(repeatPool()).slice(0, 15);
+    if(!list.length){ toast("Super – kein Wort im Wiederhol-Pool! 🎉"); go("cats"); return; }
+  } else if(mode === "random30"){
+    const learned = [...usedIds()];
+    if(learned.length < 30){ toast("Dafür brauchst du mind. 30 gelernte Wörter (aktuell "+learned.length+")."); go("home"); return; }
+    list = shuffle(learned).slice(0, 30);
+  } else {
+    const c = CATS[catIdx];
+    const ids = []; VOCAB.forEach((v,i)=>{ if(v.c===c) ids.push(i); });
+    list = shuffle(ids).slice(0, 10);
+  }
+  if(!list.length){ toast("Keine Wörter zum Testen – erst lernen!"); go("daily"); return; }
+  T = { mode:mode, cat:catIdx, list:list, i:0, res:[], answered:false };
+  renderQuestion();
+}
+function renderQuestion(){
+  const id = T.list[T.i];
+  const v = VOCAB[id];
+  const dots = T.list.map((_,k)=>{
+    if(k === T.i) return '<span class="dot now"></span>';
+    if(k < T.i) return '<span class="dot '+(T.res[k]?"ok":"bad")+'"></span>';
+    return '<span class="dot"></span>';
+  }).join("");
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>✏️ ${T.mode==="daily" ? "Täglicher Test" : T.mode==="weekly" ? "🗓️ Weekly Challenge" : T.mode==="wrong" ? "🔁 Falsch beim Test" : T.mode==="random30" ? "🎲 Random 30" : "Schreib-Training: "+esc(CATS[T.cat])}</h2>
+    <div class="progress-dots">${dots}</div>
+    <div class="card">
+      <div class="quiz-cat">${esc(v.c)}</div>
+      <div class="quiz-word">${esc(v.d)}</div>
+      <p class="muted center" style="margin:4px 0 12px">Wie heißt das auf Farsi? (Umschrift tippen – â = a ist okay)</p>
+      <input type="text" id="answer" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+             placeholder="Deine Antwort…" onkeydown="if(event.key==='Enter')checkAnswer()">
+      <div id="fb"></div>
+      <div id="actions"><button class="btn" onclick="checkAnswer()">Prüfen ✔</button></div>
+    </div>
+    <div class="counter">Wort ${T.i+1} von ${T.list.length}</div>
+  </div>`;
+  const inp = document.getElementById("answer");
+  setTimeout(()=>{ try{ inp.focus(); }catch(e){} }, 100);
+}
+function checkAnswer(){
+  if(T.answered) return;
+  const inp = document.getElementById("answer");
+  const val = inp.value;
+  if(!norm(val)){ toast("Erst etwas eintippen 😉"); return; }
+  const id = T.list[T.i];
+  const v = VOCAB[id];
+  const result = evalAnswer(val, v.f);
+  const fb = document.getElementById("fb");
+  const actions = document.getElementById("actions");
+  inp.disabled = true;
+  if(result === "correct"){
+    T.answered = true;
+    fb.innerHTML = '<div class="feedback ok pop">✅ '+PRAISE[Math.floor(Math.random()*PRAISE.length)]+' „'+esc(v.f)+'“ (+10 XP)</div>';
+    actions.innerHTML = '<button class="btn turq" onclick="nextQuestion(true)">Weiter ▶</button>';
+    sfx("ok");
+  } else if(result === "similar"){
+    fb.innerHTML = `
+      <div class="feedback warn pop">🤔 Fast gleich – entscheide selbst!</div>
+      <div class="compare">
+        <div><small>Deine Eingabe</small><b>${esc(val)}</b></div>
+        <div><small>Lösung</small><b>${esc(v.f)}</b></div>
+      </div>`;
+    actions.innerHTML = `
+      <div class="btn-row">
+        <button class="btn turq" onclick="simDecide(true)">✔ Gilt als richtig</button>
+        <button class="btn pome" onclick="simDecide(false)">✘ War falsch</button>
+      </div>`;
+    sfx("click");
+  } else {
+    T.answered = true;
+    fb.innerHTML = '<div class="feedback bad pop">❌ '+CHEER_WRONG[Math.floor(Math.random()*CHEER_WRONG.length)]+'<br>Richtig ist: <b>„'+esc(v.f)+'“</b></div>';
+    actions.innerHTML = '<button class="btn" onclick="nextQuestion(false)">Weiter ▶</button>';
+    sfx("bad");
+  }
+}
+function simDecide(ok){
+  const id = T.list[T.i];
+  const v = VOCAB[id];
+  T.answered = true;
+  const fb = document.getElementById("fb");
+  const actions = document.getElementById("actions");
+  if(ok){
+    fb.innerHTML = '<div class="feedback ok pop">✅ Zählt als richtig: „'+esc(v.f)+'“ (+10 XP)</div>';
+    sfx("ok");
+  } else {
+    fb.innerHTML = '<div class="feedback bad pop">Ehrlich währt am längsten 💪 – „'+esc(v.f)+'“ kommt in den Wiederhol-Pool.</div>';
+    sfx("bad");
+  }
+  actions.innerHTML = '<button class="btn turq" onclick="nextQuestion('+(ok?"true":"false")+')">Weiter ▶</button>';
+}
+function nextQuestion(ok){
+  const id = T.list[T.i];
+  markAnswer(id, ok);
+  T.res.push(ok);
+  T.i++;
+  T.answered = false;
+  if(T.i >= T.list.length){ finishTest(); } else { renderQuestion(); }
+}
+function finishTest(){
+  const right = T.res.filter(Boolean).length;
+  const total = T.res.length;
+  const pct = Math.round(right/total*100);
+  let bonusMsg = "";
+  if(T.mode === "random30"){
+    bonusMsg = '<p class="center muted">Falsche Wörter sind automatisch wieder im Wiederhol-Pool und kommen im täglichen Test dran. 🔁</p>'
+      + '<button class="btn" onclick="go(&quot;random30&quot;)"><span class="big-emoji">🎲</span> Gleich nochmal (neue 30 Wörter)</button>';
+  }
+  if(T.mode === "weekly"){
+    bonusMsg = '<p class="center muted">Falsche Wörter sind jetzt automatisch im Wiederhol-Pool und kommen im täglichen Test dran. 🔁</p>';
+    if(S.weeklyDone !== weekKey()){
+      S.weeklyDone = weekKey(); save();
+      addXP(75);
+      bonusMsg = '<p class="center" style="font-weight:800;color:var(--saffron)">+75 XP Wochenbonus! 🗓️</p>' + bonusMsg;
+      checkBadges();
+    }
+    bonusMsg += '<button class="btn pome" onclick="go(&quot;weekly&quot;)"><span class="big-emoji">🗓️</span> Gleich nochmal (neue 15 Wörter)</button>';
+  }
+  if(T.mode === "daily"){
+    const day = ensureToday();
+    if(!day.tested){
+      day.tested = true; save();
+      addXP(30);
+      updateDayStreak();
+      bonusMsg = '<p class="center" style="font-weight:800;color:var(--saffron)">+30 XP Tagesbonus · 🔥 Streak: '+S.streak+'</p>';
+      checkBadges();
+    }
+  }
+  if(pct >= 60){ confetti(pct); sfx("fanfare"); }
+  const face = pct>=90 ? "🥳" : pct>=60 ? "😃" : "💪";
+  APP().innerHTML = `
+  <div class="screen card center">
+    <div class="star8 pop" style="width:90px;height:90px;font-size:1.6rem;margin:10px auto">${pct}%</div>
+    <h2>${face} ${right} von ${total} richtig!</h2>
+    ${bonusMsg}
+    <p class="muted">Falsche Wörter bleiben im Wiederhol-Pool, bis sie an 3 Tagen in Folge richtig waren.</p>
+    <button class="btn saffron" onclick="go('games')"><span class="big-emoji">🎮</span> Mit Spielen festigen</button>
+    <button class="btn ghost" onclick="go('home')">Zum Start</button>
+  </div>`;
+}
+
+/* =====================================================================
+   KATEGORIEN
+   ===================================================================== */
+function viewCats(){
+  const tiles = CATS.map((c,i)=>{
+    const tot = catTotal(c), m = catMastered(c);
+    const pct = tot ? Math.round(m/tot*100) : 0;
+    return `<button class="cat-tile" onclick="go('cat',${i})">
+      <span class="em">${CAT_ICONS[c]||"📁"}</span>
+      <b>${esc(c)}</b>
+      <div class="mini-bar"><div style="width:${pct}%"></div></div>
+      <small>${m}/${tot} gemeistert</small>
+    </button>`;
+  }).join("");
+  const wrongTile = `<button class="cat-tile" style="border:2px solid var(--pome)" onclick="go('wrongCat')">
+    <span class="em">🔁</span>
+    <b>Falsch beim Test</b>
+    <small>${repeatPool().length} Wörter zum Wiederholen</small>
+  </button>`;
+  APP().innerHTML = `<div class="screen"><h2>🗂️ Kategorien</h2><div class="cat-grid">${wrongTile}${tiles}</div></div>`;
+}
+function viewCat(i){
+  const c = CATS[i];
+  const ids = []; VOCAB.forEach((v,k)=>{ if(v.c===c) ids.push(k); });
+  const list = ids.map(id=>{
+    const w = S.words[id];
+    const badge = w && w.m ? " 🏆" : (w && w.w ? " 🔁" : "");
+    return `<div style="display:flex;justify-content:space-between;gap:10px;padding:9px 4px;border-bottom:1px solid #E1EBEA">
+      <span>${esc(VOCAB[id].d)}</span><b style="color:var(--lapis)">${esc(VOCAB[id].f)}${badge}</b>
+    </div>`;
+  }).join("");
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>${CAT_ICONS[c]||""} ${esc(c)}</h2>
+    <div class="btn-row">
+      <button class="btn turq" onclick="catFlash(${i})"><span class="big-emoji">🧠</span> Karteikarten</button>
+      <button class="btn" onclick="go('catPractice',${i})"><span class="big-emoji">✏️</span> Schreib-Training (10)</button>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <p class="muted" style="margin-top:0">🏆 = gemeistert · 🔁 = im Wiederhol-Pool</p>
+      ${list}
+    </div>
+    <button class="btn ghost" onclick="go('cats')">◀ Alle Kategorien</button>
+  </div>`;
+}
+function catFlash(i){
+  const c = CATS[i];
+  const ids = []; VOCAB.forEach((v,k)=>{ if(v.c===c) ids.push(k); });
+  FC = { ids: shuffle(ids), i: 0, mode: "cat", cat: i };
+  renderFlash(c);
+}
+
+/* =====================================================================
+   VERLAUF (vergangene Daily Words) & "FALSCH BEIM TEST"
+   ===================================================================== */
+function fmtDate(ds){
+  const p = ds.split("-");
+  const dt = new Date(Number(p[0]), Number(p[1])-1, Number(p[2]));
+  const wd = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"][dt.getDay()];
+  return wd + ", " + p[2] + "." + p[1] + "." + p[0];
+}
+function viewHistory(){
+  const keys = Object.keys(S.days).sort().reverse();
+  if(!keys.length){
+    APP().innerHTML = `<div class="screen card center"><h2>📖 Vergangene Daily Words</h2>
+      <p class="muted">Noch keine Tage vorhanden – starte deine ersten Daily Words!</p>
+      <button class="btn" onclick="go('daily')">📅 Zu den Daily Words</button></div>`;
+    return;
+  }
+  const rows = keys.map(k=>{
+    const day = S.days[k];
+    const heute = (k === todayStr()) ? "Heute · " : "";
+    const status = day.tested ? " · Test ✔" : (day.learned ? " · gelernt ✔" : "");
+    return `<button class="menu-tile" onclick="go('histDay','${k}')">
+      <div class="icon">📖</div>
+      <div><b>${fmtDate(k)}</b><small>${heute}${day.ids.length} Wörter${status}</small></div>
+    </button>`;
+  }).join("");
+  APP().innerHTML = `<div class="screen">
+    <h2>📖 Vergangene Daily Words</h2>
+    <p class="muted">Tippe auf einen Tag, um genau diese Wörter noch einmal zu wiederholen.</p>
+    <div class="menu-grid">${rows}</div>
+    <button class="btn ghost" onclick="go('daily')">◀ Zurück</button>
+  </div>`;
+}
+function viewHistDay(ds){
+  const day = S.days[ds];
+  if(!day){ go("history"); return; }
+  const list = day.ids.map(id=>{
+    const w = S.words[id];
+    const badge = w && w.m ? " 🏆" : (w && w.w ? " 🔁" : "");
+    const res = day.res[id] === true ? "✅ " : (day.res[id] === false ? "❌ " : "");
+    return `<div style="display:flex;justify-content:space-between;gap:10px;padding:9px 4px;border-bottom:1px solid #E1EBEA">
+      <span>${res}${esc(VOCAB[id].d)}</span><b style="color:var(--lapis)">${esc(VOCAB[id].f)}${badge}</b>
+    </div>`;
+  }).join("");
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>📖 ${fmtDate(ds)}</h2>
+    <div class="card">
+      <p class="muted" style="margin-top:0">✅/❌ = Testergebnis dieses Tages · 🏆 gemeistert · 🔁 im Wiederhol-Pool</p>
+      ${list}
+    </div>
+    <button class="btn turq" onclick="histFlash('${ds}')"><span class="big-emoji">🧠</span> Diese Wörter mit Karteikarten lernen</button>
+    <button class="btn ghost" onclick="go('history')">◀ Alle Tage</button>
+  </div>`;
+}
+function histFlash(ds){
+  const day = S.days[ds];
+  if(!day) return;
+  FC = { ids: day.ids.slice(), i: 0, mode: "hist", date: ds, title: "Daily vom " + fmtDate(ds) };
+  renderFlash(FC.title);
+}
+function viewWrongCat(){
+  const pool = repeatPool();
+  if(!pool.length){
+    APP().innerHTML = `<div class="screen card center"><h2>🔁 Falsch beim Test</h2>
+      <p class="muted">Aktuell ist kein Wort im Wiederhol-Pool – stark! 🎉<br>Hier landen alle Wörter, die du im Test falsch beantwortest. Sie verschwinden erst wieder, wenn sie an 3 Tagen in Folge richtig waren.</p>
+      <button class="btn" onclick="go('cats')">◀ Zu den Kategorien</button></div>`;
+    return;
+  }
+  const list = pool.map(id=>{
+    const w = getW(id);
+    return `<div style="display:flex;justify-content:space-between;gap:10px;padding:9px 4px;border-bottom:1px solid #E1EBEA">
+      <span>${esc(VOCAB[id].d)}<br><small class="muted">richtig in Folge: ${w.s}/3</small></span>
+      <b style="color:var(--pome)">${esc(VOCAB[id].f)}</b>
+    </div>`;
+  }).join("");
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>🔁 Falsch beim Test</h2>
+    <p class="muted">${pool.length} Wörter warten darauf, gemeistert zu werden (3 Tage in Folge richtig).</p>
+    <div class="btn-row">
+      <button class="btn turq" onclick="wrongFlash()"><span class="big-emoji">🧠</span> Karteikarten</button>
+      <button class="btn pome" onclick="go('wrongPractice')"><span class="big-emoji">✏️</span> Schreib-Training</button>
+    </div>
+    <div class="card" style="margin-top:14px">${list}</div>
+    <button class="btn ghost" onclick="go('cats')">◀ Zu den Kategorien</button>
+  </div>`;
+}
+function wrongFlash(){
+  const pool = repeatPool();
+  if(!pool.length) return;
+  FC = { ids: shuffle(pool), i: 0, mode: "wrong", title: "Falsch beim Test" };
+  renderFlash(FC.title);
+}
+
+/* =====================================================================
+   SPIELE
+   ===================================================================== */
+function gameWords(){
+  /* Nur: heutige Daily-Wörter + Wiederhol-Pool (falsch beantwortete Wörter) */
+  const t = todayStr();
+  const set = new Set();
+  if(S.days[t]) S.days[t].ids.forEach(id => set.add(id));
+  repeatPool().forEach(id => set.add(id));
+  return [...set];
+}
+function viewGames(){
+  if(gameWords().length === 0){
+    APP().innerHTML = `<div class="screen card center"><h2>🎮 Minispiele</h2>
+      <p class="muted">Noch keine Wörter zum Spielen. Starte zuerst deine Daily Words – gespielt wird mit den heutigen Wörtern und deinem Wiederhol-Pool.</p>
+      <button class="btn" onclick="go('daily')">📅 Zu den Daily Words</button></div>`;
+    return;
+  }
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>🎮 Minispiele</h2>
+    <p class="muted">Gespielt wird mit den heutigen Daily-Wörtern + deinem Wiederhol-Pool (${gameWords().length} Wörter).</p>
+    <div class="menu-grid">
+      <button class="menu-tile" onclick="go('memory')">
+        <div class="icon">🃏</div><div><b>Memory</b><small>Deutsch ↔ Farsi Paare finden</small></div>
+      </button>
+      <button class="menu-tile" onclick="go('blitz')">
+        <div class="icon">⚡</div><div><b>Blitz-Quiz</b><small>60 Sekunden gegen die Uhr</small></div>
+      </button>
+      <button class="menu-tile" onclick="go('scramble')">
+        <div class="icon">🔤</div><div><b>Buchstaben-Wirrwarr</b><small>Wörter zusammensetzen</small></div>
+      </button>
+    </div>
+  </div>`;
+}
+
+/* ---------- Memory ---------- */
+let MEM = null;
+function viewMemory(){
+  S.games.memory = true; save(); checkBadges();
+  const ids = shuffle(gameWords()).slice(0, 8);
+  const cards = [];
+  ids.forEach(id=>{ cards.push({id:id, side:"d"}); cards.push({id:id, side:"f"}); });
+  MEM = { cards: shuffle(cards), open: [], done: 0, total: ids.length, lock: false };
+  renderMemory();
+}
+function renderMemory(){
+  const grid = MEM.cards.map((c,i)=>{
+    const isOpen = MEM.open.includes(i) || c.matched;
+    const cls = c.matched ? "mem-card done" : (isOpen ? "mem-card open" : "mem-card");
+    const label = isOpen ? esc(c.side==="d" ? VOCAB[c.id].d : VOCAB[c.id].f) : "✳";
+    return `<button class="${cls}" onclick="memClick(${i})">${label}</button>`;
+  }).join("");
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>🃏 Memory</h2>
+    <p class="muted">Finde die Paare: deutsches Wort + Farsi-Umschrift. Gefunden: ${MEM.done}/${MEM.total}</p>
+    <div class="memory-grid">${grid}</div>
+    <div class="spacer"></div>
+    <button class="btn ghost" onclick="go('games')">◀ Spieleauswahl</button>
+  </div>`;
+}
+function memClick(i){
+  if(MEM.lock) return;
+  const c = MEM.cards[i];
+  if(c.matched || MEM.open.includes(i)) return;
+  sfx("click");
+  MEM.open.push(i);
+  renderMemory();
+  if(MEM.open.length === 2){
+    MEM.lock = true;
+    const a = MEM.cards[MEM.open[0]], b = MEM.cards[MEM.open[1]];
+    if(a.id === b.id){
+      setTimeout(()=>{
+        a.matched = true; b.matched = true;
+        MEM.open = []; MEM.lock = false; MEM.done++;
+        addXP(5); sfx("ok");
+        renderMemory();
+        if(MEM.done === MEM.total){
+          addXP(20); confetti(70); sfx("fanfare");
+          setTimeout(()=>toast("🃏 Memory geschafft! +20 XP Bonus"), 200);
+        }
+      }, 450);
+    } else {
+      setTimeout(()=>{ MEM.open = []; MEM.lock = false; sfx("bad"); renderMemory(); }, 900);
+    }
+  }
+}
+
+/* ---------- Blitz-Quiz ---------- */
+let BZ = null;
+function viewBlitz(){
+  S.games.blitz = true; save(); checkBadges();
+  BZ = { pool: shuffle(gameWords()), i: 0, score: 0, time: 60, lock: false };
+  const iv = setInterval(()=>{
+    BZ.time--;
+    const bar = document.getElementById("bz-bar");
+    const lbl = document.getElementById("bz-time");
+    if(bar) bar.style.width = (BZ.time/60*100)+"%";
+    if(lbl) lbl.textContent = BZ.time+" s";
+    if(BZ.time <= 0){ clearTimers(); blitzEnd(); }
+  }, 1000);
+  TIMERS.push(iv);
+  renderBlitz();
+}
+function renderBlitz(){
+  if(BZ.i >= BZ.pool.length){ BZ.pool = shuffle(BZ.pool); BZ.i = 0; }
+  const id = BZ.pool[BZ.i];
+  const v = VOCAB[id];
+  const opts = [v.f];
+  while(opts.length < 4){
+    const r = VOCAB[Math.floor(Math.random()*VOCAB.length)].f;
+    if(!opts.includes(r)) opts.push(r);
+  }
+  shuffle(opts);
+  BZ.correct = v.f;
+  const btns = opts.map(o=>`<button class="choice" onclick="blitzPick(this,'${esc(o).replace(/'/g,"\\'")}')">${esc(o)}</button>`).join("");
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>⚡ Blitz-Quiz <span style="float:right;font-size:1rem" id="bz-time">${BZ.time} s</span></h2>
+    <div class="timer-bar"><div id="bz-bar" style="width:${BZ.time/60*100}%"></div></div>
+    <div class="card">
+      <div class="quiz-cat">${esc(v.c)}</div>
+      <div class="quiz-word">${esc(v.d)}</div>
+      <div class="spacer"></div>
+      <div class="choice-grid">${btns}</div>
+    </div>
+    <div class="counter">Richtig: ${BZ.score} ✔</div>
+  </div>`;
+}
+function blitzPick(el, val){
+  if(BZ.lock) return;
+  BZ.lock = true;
+  const ok = (val === BZ.correct);
+  el.classList.add(ok ? "ok" : "bad");
+  if(ok){ BZ.score++; addXP(5); sfx("ok"); }
+  else {
+    sfx("bad");
+    document.querySelectorAll(".choice").forEach(b=>{ if(b.textContent === BZ.correct) b.classList.add("ok"); });
+  }
+  setTimeout(()=>{ BZ.i++; BZ.lock = false; if(BZ.time > 0) renderBlitz(); }, ok ? 350 : 900);
+}
+function blitzEnd(){
+  confetti(Math.min(BZ.score*8, 90)); sfx("fanfare");
+  APP().innerHTML = `
+  <div class="screen card center">
+    <h2>⏱️ Zeit um!</h2>
+    <div class="star8 pop" style="width:90px;height:90px;margin:10px auto">${BZ.score}</div>
+    <p style="font-weight:800">${BZ.score} richtige Antworten – ${BZ.score*5} XP!</p>
+    <button class="btn saffron" onclick="go('blitz')">Nochmal ⚡</button>
+    <button class="btn ghost" onclick="go('games')">◀ Spieleauswahl</button>
+  </div>`;
+}
+
+/* ---------- Buchstaben-Wirrwarr ---------- */
+let SCR = null;
+function viewScramble(){
+  S.games.scramble = true; save(); checkBadges();
+  let ids = gameWords().filter(id => VOCAB[id].f.length <= 12);
+  if(!ids.length) ids = gameWords();
+  SCR = { ids: shuffle(ids).slice(0, 8), i: 0, solved: 0 };
+  scrambleRound();
+}
+function scrambleRound(){
+  if(SCR.i >= SCR.ids.length){ scrambleEnd(); return; }
+  const id = SCR.ids[SCR.i];
+  const target = VOCAB[id].f.replace(/\s+/g,"");
+  SCR.target = target;
+  SCR.letters = shuffle(target.split(""));
+  SCR.filled = [];
+  renderScramble();
+}
+function renderScramble(){
+  const id = SCR.ids[SCR.i];
+  const v = VOCAB[id];
+  const slots = SCR.target.split("").map((_,k)=>{
+    const ch = SCR.filled[k] !== undefined ? SCR.letters[SCR.filled[k]] : "";
+    return `<div class="slot ${ch?"filled":""}">${esc(ch)}</div>`;
+  }).join("");
+  const letters = SCR.letters.map((ch,k)=>{
+    const used = SCR.filled.includes(k);
+    return `<button class="letter ${used?"used":""}" onclick="scrPick(${k})">${esc(ch)}</button>`;
+  }).join("");
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>🔤 Buchstaben-Wirrwarr</h2>
+    <div class="counter">Wort ${SCR.i+1} von ${SCR.ids.length} · gelöst: ${SCR.solved}</div>
+    <div class="card center">
+      <div class="quiz-cat">${esc(v.c)}</div>
+      <div class="quiz-word">${esc(v.d)}</div>
+      <div class="answer-slots">${slots}</div>
+      <div class="letters">${letters}</div>
+      <div id="scr-fb"></div>
+      <div class="btn-row">
+        <button class="btn ghost small" onclick="scrUndo()">⌫ Zurück</button>
+        <button class="btn ghost small" onclick="scrSkip()">Überspringen ▶</button>
+      </div>
+    </div>
+    <button class="btn ghost" onclick="go('games')">◀ Spieleauswahl</button>
+  </div>`;
+}
+function scrPick(k){
+  if(SCR.filled.includes(k) || SCR.filled.length >= SCR.target.length) return;
+  sfx("click");
+  SCR.filled.push(k);
+  renderScramble();
+  if(SCR.filled.length === SCR.target.length){
+    const word = SCR.filled.map(x=>SCR.letters[x]).join("");
+    const fb = document.getElementById("scr-fb");
+    if(word === SCR.target){
+      SCR.solved++; addXP(8); sfx("ok"); confetti(20);
+      fb.innerHTML = '<div class="feedback ok pop">✅ Richtig! „'+esc(VOCAB[SCR.ids[SCR.i]].f)+'“ (+8 XP)</div>';
+      setTimeout(()=>{ SCR.i++; scrambleRound(); }, 900);
+    } else {
+      sfx("bad");
+      fb.innerHTML = '<div class="feedback bad pop">Noch nicht – sortiere um! ⌫</div>';
+    }
+  }
+}
+function scrUndo(){ SCR.filled.pop(); renderScramble(); }
+function scrSkip(){ SCR.i++; scrambleRound(); }
+function scrambleEnd(){
+  confetti(60); sfx("fanfare");
+  APP().innerHTML = `
+  <div class="screen card center">
+    <h2>🔤 Fertig!</h2>
+    <div class="star8 pop" style="width:90px;height:90px;margin:10px auto">${SCR.solved}/${SCR.ids.length}</div>
+    <p style="font-weight:800">${SCR.solved} Wörter zusammengesetzt!</p>
+    <button class="btn saffron" onclick="go('scramble')">Nochmal 🔤</button>
+    <button class="btn ghost" onclick="go('games')">◀ Spieleauswahl</button>
+  </div>`;
+}
+
+/* =====================================================================
+   FORTSCHRITT & ABZEICHEN
+   ===================================================================== */
+function viewProgress(){
+  const li = levelInfo();
+  const pool = repeatPool().length;
+  const badges = BADGES.map(b=>{
+    const has = S.badges.includes(b.id);
+    return `<div class="badge ${has?"":"locked"}"><div class="em">${b.em}</div><small>${esc(b.t)}</small></div>`;
+  }).join("");
+  const catBars = CATS.map(c=>{
+    const tot = catTotal(c), m = catMastered(c);
+    const pct = tot ? Math.round(m/tot*100) : 0;
+    return `<div class="cat-progress">
+      <div class="row"><span>${CAT_ICONS[c]||""} ${esc(c)}</span><span>${m}/${tot}</span></div>
+      <div class="mini-bar"><div style="width:${pct}%"></div></div>
+    </div>`;
+  }).join("");
+  APP().innerHTML = `
+  <div class="screen">
+    <h2>🏆 Dein Fortschritt</h2>
+    <div class="stat-grid">
+      <div class="stat"><b>🔥 ${S.streak}</b><small>Tage-Streak</small></div>
+      <div class="stat"><b>⭐ ${li.l}</b><small>Level (${S.xp} XP)</small></div>
+      <div class="stat"><b>🏆 ${masteredCount()}</b><small>Wörter gemeistert</small></div>
+      <div class="stat"><b>🔁 ${pool}</b><small>im Wiederhol-Pool</small></div>
+    </div>
+    <div class="card"><h3>Abzeichen</h3><div class="badge-grid">${badges}</div></div>
+    <div class="card"><h3>Kategorien</h3>${catBars}</div>
+  </div>`;
+}
+
+/* =====================================================================
+   START
+   ===================================================================== */
+document.getElementById("sound-toggle").textContent = S.sound ? "🔊" : "🔇";
+renderHeader();
+checkBadges();
+go("home");
+</script>
+</body>
+</html>
